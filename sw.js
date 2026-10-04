@@ -4,7 +4,7 @@
    SERVICE WORKER
    ========================================================= */
 
-const CACHE_NAME = "dl-luxury-admin-v10";
+const CACHE_NAME = "dl-luxury-admin-v11";
 
 
 const ARCHIVOS = [
@@ -14,7 +14,7 @@ const ARCHIVOS = [
     "./script.js",
     "./admin.js",
     "./adonvent.js",
-    "./pedidos-admin.js?v=20261004-2",
+    "./pedidos-admin.js",
     "./anos.js",
     "./manifest.json",
     "./icono1.png",
@@ -48,9 +48,61 @@ self.addEventListener(
                         );
 
 
-                    await cache.addAll(
-                        ARCHIVOS
-                    );
+                    /*
+                     * Guardar los archivos uno por uno.
+                     *
+                     * Si algún archivo falla,
+                     * no queremos que todo el proceso
+                     * quede bloqueado.
+                     */
+
+                    for (
+                        const archivo
+                        of ARCHIVOS
+                    ) {
+
+                        try {
+
+                            const respuesta =
+                                await fetch(
+                                    archivo,
+                                    {
+                                        cache:
+                                            "no-store"
+                                    }
+                                );
+
+
+                            if (
+                                respuesta.ok
+                            ) {
+
+                                await cache.put(
+                                    archivo,
+                                    respuesta
+                                );
+
+                            } else {
+
+                                console.warn(
+                                    "No se pudo guardar:",
+                                    archivo,
+                                    respuesta.status
+                                );
+
+                            }
+
+                        } catch (error) {
+
+                            console.warn(
+                                "No se pudo guardar en caché:",
+                                archivo,
+                                error
+                            );
+
+                        }
+
+                    }
 
 
                     console.log(
@@ -110,8 +162,8 @@ self.addEventListener(
                         async cacheName => {
 
                             /*
-                             * Eliminar cualquier caché
-                             * anterior de DL Luxury.
+                             * Eliminar TODAS las cachés
+                             * anteriores de DL Luxury.
                              */
 
                             if (
@@ -141,8 +193,7 @@ self.addEventListener(
 
 
                 /*
-                 * Tomar control inmediatamente
-                 * de las páginas abiertas.
+                 * Tomar control inmediatamente.
                  */
 
                 await self.clients.claim();
@@ -151,6 +202,36 @@ self.addEventListener(
                 console.log(
                     "DL Luxury: Service Worker activo:",
                     CACHE_NAME
+                );
+
+
+                /*
+                 * Avisar a las páginas abiertas
+                 * que ya hay una versión nueva.
+                 */
+
+                const clientes =
+                    await self.clients.matchAll(
+                        {
+                            type: "window"
+                        }
+                    );
+
+
+                clientes.forEach(
+                    cliente => {
+
+                        cliente.postMessage(
+                            {
+                                tipo:
+                                    "DL_LUXURY_SW_ACTUALIZADO",
+
+                                version:
+                                    CACHE_NAME
+                            }
+                        );
+
+                    }
                 );
 
             })()
@@ -237,7 +318,7 @@ self.addEventListener(
 
         /* =================================================
            HTML
-           
+
            RED PRIMERO
            CACHÉ SOLO COMO RESPALDO
         ================================================= */
@@ -284,6 +365,7 @@ self.addEventListener(
 
 
                         return respuesta;
+
 
                     } catch (error) {
 
@@ -350,11 +432,9 @@ self.addEventListener(
 
            RED PRIMERO
 
-           MUY IMPORTANTE:
-           usamos cache: "no-store"
-
-           para que el teléfono solicite
-           la versión actual al servidor.
+           IMPORTANTE:
+           siempre intenta obtener la versión
+           actual de GitHub primero.
         ================================================= */
 
         event.respondWith(
@@ -393,6 +473,7 @@ self.addEventListener(
 
 
                     return respuesta;
+
 
                 } catch (error) {
 
@@ -471,7 +552,7 @@ console.log(
 );
 
 console.log(
-    "Cache de archivos antiguos eliminado"
+    "Caché anterior eliminada"
 );
 
 console.log(
