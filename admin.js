@@ -1,34 +1,21 @@
 /* =========================================================
    DL LUXURY
    SISTEMA DE ADMINISTRACIÓN
-   SCRIPT PRINCIPAL
-
-   ESTE ARCHIVO MANEJA:
-
-   - Inicio
-   - Ingresos
-   - Ventas
-   - Egresos
-   - Stock
-   - Dashboard
-   - Pedidos
-   - Confirmar compra
-   - Dar puntos
-   - Datos económicos de pedidos confirmados
-
-   =========================================================
 
    PUNTOS:
+   5% DEL TOTAL DE LA COMPRA
 
-   Q149  = 0 puntos
-   Q150  = 5 puntos
-   Q300  = 10 puntos
-   Q450  = 15 puntos
-   Q600  = 20 puntos
+   Q100   = 5 puntos
+   Q200   = 10 puntos
+   Q500   = 25 puntos
+   Q1000  = 50 puntos
+   Q1040  = 52 puntos
+   Q2000  = 100 puntos
+
+   1 PUNTO = Q1
 
    FÓRMULA:
-
-   Math.floor(total / 150) * 5
+   Math.floor(total * 0.05)
 ========================================================= */
 
 
@@ -1710,12 +1697,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        console.log(
-            "🔄 Actualizando Dashboard para el año:",
-            anoActual
-        );
-
-
         const pedidos =
             await obtenerPedidosConfirmados();
 
@@ -1986,9 +1967,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /* =====================================================
        SELECTOR DE AÑOS
-
-       42 AÑOS:
-       2026 - 2067
     ===================================================== */
 
     async function llenarSelectorAnios() {
@@ -2006,6 +1984,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const anoInicial =
             2026;
+
 
         const cantidadAnios =
             42;
@@ -2054,7 +2033,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 selector.appendChild(
                     opcion
                 );
-
             }
         );
 
@@ -2127,7 +2105,6 @@ document.addEventListener("DOMContentLoaded", function () {
             anoTexto.textContent =
                 anoSeleccionado;
         }
-
     }
 
 
@@ -2565,8 +2542,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const puntosCalculados =
                 Math.floor(
-                    total / 150
-                ) * 5;
+                    total * 0.05
+                );
 
 
             if (
@@ -2595,7 +2572,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         Dar ${puntosCalculados}
                         ${puntosCalculados === 1
                         ? "punto"
-                        : "puntos"}
+                        : "puntos"
+                    }
 
                     </button>
                 `;
@@ -2950,6 +2928,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /* =====================================================
        DAR PUNTOS
+       
+       5% DEL TOTAL
+       1 PUNTO = Q1
+
+       ESTA VERSIÓN PERMITE ENCONTRAR EL PERFIL
+       DE DIFERENTES FORMAS.
     ===================================================== */
 
     window.darPuntos =
@@ -2959,7 +2943,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const confirmar =
                 window.confirm(
-                    "¿Deseas otorgar los puntos de esta compra?"
+                    "¿Deseas generar los puntos de esta compra?"
                 );
 
 
@@ -2969,6 +2953,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             try {
+
+                /* =========================================
+                   1. OBTENER PEDIDO
+                ========================================= */
 
                 const {
                     data: pedido,
@@ -3011,11 +2999,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
 
-                if (
+                /* =========================================
+                   2. VERIFICAR ESTADO
+                ========================================= */
+
+                const estado =
                     String(
                         pedido.estado || ""
-                    ).toLowerCase() !==
-                    "confirmada"
+                    )
+                        .trim()
+                        .toLowerCase();
+
+
+                if (
+                    estado !== "confirmada"
                 ) {
 
                     alert(
@@ -3026,12 +3023,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
 
+                /* =========================================
+                   3. EVITAR DUPLICAR
+                ========================================= */
+
                 if (
                     pedido.puntos_validados === true
                 ) {
 
                     alert(
-                        "Los puntos de este pedido ya fueron otorgados."
+                        "Los puntos de este pedido ya fueron generados."
                     );
 
 
@@ -3041,16 +3042,37 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
 
+                /* =========================================
+                   4. OBTENER TOTAL
+                ========================================= */
+
                 const total =
                     obtenerTotalPedido(
                         pedido
                     );
 
 
+                if (
+                    !Number.isFinite(total) ||
+                    total <= 0
+                ) {
+
+                    alert(
+                        "Este pedido no tiene un total válido."
+                    );
+
+                    return;
+                }
+
+
+                /* =========================================
+                   5. CALCULAR 5%
+                ========================================= */
+
                 const puntos =
                     Math.floor(
-                        total / 150
-                    ) * 5;
+                        total * 0.05
+                    );
 
 
                 if (
@@ -3059,75 +3081,352 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     alert(
                         "Esta compra no genera puntos.\n\n" +
-                        "La compra mínima es de Q150.00."
+                        "El total mínimo es Q20.00."
                     );
 
                     return;
                 }
 
 
-                const usuarioId =
-                    pedido.usuario_id;
+                console.log(
+                    "⭐ GENERANDO PUNTOS",
+                    {
+                        pedido:
+                            pedido.id,
+
+                        total:
+                            total,
+
+                        puntos:
+                            puntos,
+
+                        pedidoCompleto:
+                            pedido
+                    }
+                );
+
+
+                /* =========================================
+                   6. BUSCAR ID DEL CLIENTE
+                ========================================= */
+
+                let usuarioId =
+                    pedido.usuario_id ||
+                    pedido.user_id ||
+                    pedido.cliente_id ||
+                    pedido.perfil_id ||
+                    null;
+
+
+                let perfil = null;
+
+
+                console.log(
+                    "🔎 Usuario ID inicial:",
+                    usuarioId
+                );
+
+
+                /* =========================================
+                   7. BUSCAR PERFIL POR ID
+                ========================================= */
+
+                if (
+                    usuarioId
+                ) {
+
+                    const {
+                        data: perfilEncontrado,
+                        error: errorPerfil
+                    } =
+                        await supabaseClient
+                            .from("perfiles")
+                            .select("*")
+                            .eq(
+                                "id",
+                                usuarioId
+                            )
+                            .maybeSingle();
+
+
+                    if (
+                        !errorPerfil &&
+                        perfilEncontrado
+                    ) {
+
+                        perfil =
+                            perfilEncontrado;
+
+                    } else if (
+                        errorPerfil
+                    ) {
+
+                        console.warn(
+                            "⚠️ No se pudo buscar perfil por ID:",
+                            errorPerfil
+                        );
+                    }
+                }
+
+
+                /* =========================================
+                   8. BUSCAR POR CORREO
+                   
+                   Aquí NO usamos:
+                   .select('id,"correo","email"')
+
+                   porque eso falla si alguna columna
+                   no existe.
+
+                   Obtenemos los perfiles y buscamos
+                   diferentes nombres posibles.
+                ========================================= */
+
+                if (
+                    !perfil &&
+                    pedido.cliente_correo
+                ) {
+
+                    const correoPedido =
+                        String(
+                            pedido.cliente_correo
+                        )
+                            .trim()
+                            .toLowerCase();
+
+
+                    console.log(
+                        "🔎 Buscando cliente por correo:",
+                        correoPedido
+                    );
+
+
+                    const {
+                        data: perfiles,
+                        error: errorPerfiles
+                    } =
+                        await supabaseClient
+                            .from("perfiles")
+                            .select("*");
+
+
+                    if (
+                        errorPerfiles
+                    ) {
+
+                        console.warn(
+                            "⚠️ No se pudieron obtener perfiles:",
+                            errorPerfiles
+                        );
+
+                    } else {
+
+                        perfil =
+                            (perfiles || [])
+                                .find(
+                                    function (p) {
+
+                                        const posiblesCorreos = [
+
+                                            p.email,
+
+                                            p.correo,
+
+                                            p.correo_electronico,
+
+                                            p.email_usuario,
+
+                                            p.correo_usuario
+
+                                        ];
+
+
+                                        return posiblesCorreos
+                                            .some(
+                                                function (correo) {
+
+                                                    return (
+                                                        String(
+                                                            correo || ""
+                                                        )
+                                                            .trim()
+                                                            .toLowerCase() ===
+                                                        correoPedido
+                                                    );
+                                                }
+                                            );
+                                    }
+                                ) || null;
+
+
+                        if (perfil) {
+
+                            usuarioId =
+                                perfil.id;
+
+
+                            console.log(
+                                "✅ Perfil encontrado por correo:",
+                                perfil
+                            );
+                        }
+                    }
+                }
+
+
+                /* =========================================
+                   9. ÚLTIMO INTENTO:
+                      BUSCAR POR NOMBRE
+                ========================================= */
+
+                if (
+                    !perfil &&
+                    pedido.cliente_nombre
+                ) {
+
+                    const nombrePedido =
+                        String(
+                            pedido.cliente_nombre
+                        )
+                            .trim()
+                            .toLowerCase();
+
+
+                    console.log(
+                        "🔎 Buscando cliente por nombre:",
+                        nombrePedido
+                    );
+
+
+                    const {
+                        data: perfiles,
+                        error: errorPerfiles
+                    } =
+                        await supabaseClient
+                            .from("perfiles")
+                            .select("*");
+
+
+                    if (
+                        !errorPerfiles
+                    ) {
+
+                        perfil =
+                            (perfiles || [])
+                                .find(
+                                    function (p) {
+
+                                        const nombres = [
+
+                                            p.nombre,
+
+                                            p.nombre_completo,
+
+                                            p.nombre_usuario,
+
+                                            p.usuario,
+
+                                            p.full_name
+
+                                        ];
+
+
+                                        return nombres
+                                            .some(
+                                                function (nombre) {
+
+                                                    return (
+                                                        String(
+                                                            nombre || ""
+                                                        )
+                                                            .trim()
+                                                            .toLowerCase() ===
+                                                        nombrePedido
+                                                    );
+                                                }
+                                            );
+                                    }
+                                ) || null;
+
+
+                        if (perfil) {
+
+                            usuarioId =
+                                perfil.id;
+
+
+                            console.log(
+                                "✅ Perfil encontrado por nombre:",
+                                perfil
+                            );
+                        }
+                    }
+                }
+
+
+                /* =========================================
+                   10. SI NO EXISTE PERFIL
+                ========================================= */
+
+                if (
+                    !perfil
+                ) {
+
+                    console.error(
+                        "❌ No se encontró perfil para el pedido:",
+                        pedido
+                    );
+
+
+                    alert(
+                        "No se encontró el perfil del cliente.\n\n" +
+
+                        "Pedido: #" +
+                        pedido.id +
+
+                        "\nCliente: " +
+                        (
+                            pedido.cliente_nombre ||
+                            "Sin nombre"
+                        ) +
+
+                        "\nCorreo: " +
+                        (
+                            pedido.cliente_correo ||
+                            "Sin correo"
+                        ) +
+
+                        "\n\n" +
+
+                        "Verifica que el cliente tenga un registro en la tabla perfiles."
+                    );
+
+
+                    return;
+                }
+
+
+                /* =========================================
+                   11. OBTENER ID REAL DEL PERFIL
+                ========================================= */
+
+                usuarioId =
+                    perfil.id;
 
 
                 if (!usuarioId) {
 
                     alert(
-                        "Este pedido no tiene usuario_id."
-                    );
-
-
-                    console.error(
-                        "Pedido sin usuario_id:",
-                        pedido
+                        "El perfil encontrado no tiene un ID válido."
                     );
 
                     return;
                 }
 
 
-                const {
-                    data: perfil,
-                    error: errorPerfil
-                } =
-                    await supabaseClient
-                        .from("perfiles")
-                        .select(
-                            'id,"Puntos"'
-                        )
-                        .eq(
-                            "id",
-                            usuarioId
-                        )
-                        .maybeSingle();
-
-
-                if (errorPerfil) {
-
-                    console.error(
-                        "❌ Error buscando perfil:",
-                        errorPerfil
-                    );
-
-
-                    alert(
-                        "No se pudo obtener el perfil del cliente.\n\n" +
-                        errorPerfil.message
-                    );
-
-                    return;
-                }
-
-
-                if (!perfil) {
-
-                    alert(
-                        "No existe un perfil para este usuario."
-                    );
-
-                    return;
-                }
-
+                /* =========================================
+                   12. OBTENER PUNTOS ACTUALES
+                ========================================= */
 
                 const puntosActuales =
                     Number(
@@ -3140,8 +3439,28 @@ document.addEventListener("DOMContentLoaded", function () {
                     puntos;
 
 
+                console.log(
+                    "⭐ PUNTOS",
+                    {
+                        anteriores:
+                            puntosActuales,
+
+                        generados:
+                            puntos,
+
+                        nuevos:
+                            nuevosPuntos
+                    }
+                );
+
+
+                /* =========================================
+                   13. ACTUALIZAR PUNTOS
+                ========================================= */
+
                 const {
-                    error: errorActualizarPerfil
+                    error:
+                    errorActualizarPerfil
                 } =
                     await supabaseClient
                         .from("perfiles")
@@ -3176,8 +3495,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
 
+                /* =========================================
+                   14. MARCAR PEDIDO
+                ========================================= */
+
                 const {
-                    error: errorValidarPedido
+                    error:
+                    errorValidarPedido
                 } =
                     await supabaseClient
                         .from("pedidos")
@@ -3210,7 +3534,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
                     alert(
-                        "Los puntos fueron agregados, pero no se pudo marcar el pedido como validado.\n\n" +
+                        "Los puntos fueron agregados correctamente, " +
+                        "pero no se pudo marcar el pedido como validado.\n\n" +
                         errorValidarPedido.message
                     );
 
@@ -3218,15 +3543,43 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
 
+                /* =========================================
+                   15. ÉXITO
+                ========================================= */
+
                 alert(
-                    "Puntos otorgados correctamente.\n\n" +
-                    "Puntos agregados: " +
+                    "⭐ PUNTOS OTORGADOS CORRECTAMENTE\n\n" +
+
+                    "Pedido: #" +
+                    pedido.id +
+
+                    "\nCliente: " +
+                    (
+                        pedido.cliente_nombre ||
+                        "Cliente"
+                    ) +
+
+                    "\n\nVenta: " +
+                    dinero(total) +
+
+                    "\n5% de la venta: " +
                     puntos +
-                    "\n" +
-                    "Puntos actuales: " +
+                    " puntos" +
+
+                    "\nValor de los puntos: " +
+                    dinero(puntos) +
+
+                    "\n\nPuntos anteriores: " +
+                    puntosActuales +
+
+                    "\nPuntos nuevos: " +
                     nuevosPuntos
                 );
 
+
+                /* =========================================
+                   16. RECARGAR PEDIDOS
+                ========================================= */
 
                 await cargarPedidos();
 
@@ -3234,13 +3587,17 @@ document.addEventListener("DOMContentLoaded", function () {
             } catch (error) {
 
                 console.error(
-                    "❌ Error inesperado dando puntos:",
+                    "❌ ERROR COMPLETO DANDO PUNTOS:",
                     error
                 );
 
 
                 alert(
-                    "Ocurrió un error al otorgar los puntos."
+                    "Ocurrió un error al otorgar los puntos.\n\n" +
+                    (
+                        error?.message ||
+                        "Error desconocido."
+                    )
                 );
             }
         };
@@ -3248,16 +3605,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /* =====================================================
        CAMBIO DE AÑO
-       
-       IMPORTANTE:
-       anos.js controla el selector.
-
-       anos.js guarda el año y dispara:
-
-       "añoDashboardCambiado"
-
-       Este archivo recibe ese evento y actualiza
-       todo el Dashboard.
     ===================================================== */
 
     document.addEventListener(
@@ -3277,24 +3624,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     ano < 1900
                 ) {
 
-                    console.warn(
-                        "⚠️ Año recibido no válido:",
-                        evento?.detail?.año
-                    );
-
                     return;
                 }
 
-
-                console.log(
-                    "📅 Año seleccionado:",
-                    ano
-                );
-
-
-                /* =========================================
-                   GUARDAR AÑO
-                ========================================= */
 
                 localStorage.setItem(
                     ANO_KEY,
@@ -3303,10 +3635,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     )
                 );
 
-
-                /* =========================================
-                   ACTUALIZAR TEXTO DEL AÑO
-                ========================================= */
 
                 const anoTexto =
                     document.getElementById(
@@ -3321,44 +3649,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
 
-                /* =========================================
-                   ACTUALIZAR DASHBOARD
-                ========================================= */
-
                 await actualizarDashboard();
-
-
-                /* =========================================
-                   ACTUALIZAR EGRESOS
-                ========================================= */
 
                 mostrarEgresos();
 
-
-                /* =========================================
-                   ACTUALIZAR INGRESOS
-                ========================================= */
-
                 await cargarIngresos();
-
-
-                /* =========================================
-                   ACTUALIZAR VENTAS
-                ========================================= */
 
                 await cargarVentas();
 
-
-                /* =========================================
-                   ACTUALIZAR PEDIDOS
-                ========================================= */
-
                 await cargarPedidos();
 
-
-                /* =========================================
-                   AVISAR A OTROS SCRIPTS
-                ========================================= */
 
                 window.dispatchEvent(
                     new CustomEvent(
@@ -3372,20 +3672,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
-                console.log(
-                    "✅ DL Luxury actualizado completamente para:",
-                    ano
-                );
-
-
             } catch (error) {
 
                 console.error(
-                    "❌ Error actualizando el Dashboard por cambio de año:",
+                    "❌ Error actualizando año:",
                     error
                 );
             }
-
         }
     );
 
@@ -3434,21 +3727,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         await llenarSelectorAnios();
 
-
         await cargarStock();
-
 
         await actualizarDashboard();
 
-
         await cargarVentas();
-
 
         await cargarIngresos();
 
-
         mostrarEgresos();
-
 
         await cargarPedidos();
 
@@ -3469,46 +3756,35 @@ document.addEventListener("DOMContentLoaded", function () {
     window.cargarStock =
         cargarStock;
 
-
     window.cargarVentas =
         cargarVentas;
-
 
     window.cargarIngresos =
         cargarIngresos;
 
-
     window.mostrarEgresos =
         mostrarEgresos;
-
 
     window.actualizarDashboard =
         actualizarDashboard;
 
-
     window.llenarSelectorAnios =
         llenarSelectorAnios;
-
 
     window.obtenerPedidosConfirmados =
         obtenerPedidosConfirmados;
 
-
     window.cargarPedidos =
         cargarPedidos;
-
 
     window.obtenerProductosPedido =
         obtenerProductosPedido;
 
-
     window.obtenerCantidadProductosPedido =
         obtenerCantidadProductosPedido;
 
-
     window.obtenerTotalPedido =
         obtenerTotalPedido;
-
 
     window.obtenerAnoSeleccionado =
         obtenerAnoSeleccionado;
