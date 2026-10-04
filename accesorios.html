@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DL Luxury - Accesorios</title>
+
+    <!-- =====================================================
+         CSS PRINCIPAL
+    ====================================================== -->
+
+    <link rel="stylesheet" href="playeras.css">
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- LOGO -->
+
+        <div class="logo">
+
+            <div class="logo-dl">
+                DL
+            </div>
+
+            <div class="logo-luxury">
+                LUXURY
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             MENÚ
+        ================================================== -->
+
+        <nav>
+
+
+            <!-- INICIO -->
+
+            <button class="menu" type="button" onclick="window.location.href='index.html'">
+
+                <i class="fa-solid fa-house"></i>
+
+                <span>
+                    Inicio
+                </span>
+
+            </button>
+
+
+            <!-- GORRAS -->
+
+            <button class="menu" type="button" onclick="window.location.href='gorras.html'">
+
+                <i class="fa-solid fa-hat-cowboy"></i>
+
+                <span>
+                    Gorras
+                </span>
+
+            </button>
+
+
+            <!-- PLAYERAS -->
+
+            <button class="menu" type="button" onclick="window.location.href='playeras.html'">
+
+                <i class="fa-solid fa-shirt"></i>
+
+                <span>
+                    Playeras
+                </span>
+
+            </button>
+
+
+            <!-- HOODIES -->
+
+            <button class="menu" type="button" onclick="window.location.href='hoodies.html'">
+
+                <i class="fa-solid fa-shirt"></i>
+
+                <span>
+                    Hoodies
+                </span>
+
+            </button>
+
+
+            <!-- PERFUMES -->
+
+            <button class="menu" type="button" onclick="window.location.href='perfumes.html'">
+
+                <i class="fa-solid fa-spray-can-sparkles"></i>
+
+                <span>
+                    Perfumes
+                </span>
+
+            </button>
+
+
+            <!-- ACCESORIOS -->
+
+            <button class="menu active" type="button" onclick="window.location.href='accesorios.html'">
+
+                <i class="fa-solid fa-motorcycle"></i>
+
+                <span>
+                    Accesorios
+                </span>
+
+            </button>
+
+
+            <!-- DESCUENTOS -->
+
+            <button class="menu" type="button" onclick="window.location.href='descuentos.html'">
+
+                <i class="fa-solid fa-tag"></i>
+
+                <span>
+                    Descuentos
+                </span>
+
+            </button>
+
+
+        </nav>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL
+    ====================================================== -->
+
+    <main class="contenido">
+
+
+        <!-- =================================================
+             TOPBAR
+        ================================================== -->
+
+        <header class="topbar">
+
+
+            <h1 id="titulo">
+                Accesorios
+            </h1>
+
+
+            <div class="usuario">
+
+                <div class="usuario-icono">
+
+                    <i class="fa-solid fa-user"></i>
+
+                </div>
+
+                <span>
+                    Administrador
+                </span>
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =================================================
+             SECCIÓN ACCESORIOS
+        ================================================== -->
+
+        <section id="accesorios" class="seccion activa">
+
+
+            <!-- =================================================
+                 ENCABEZADO
+            ================================================== -->
+
+            <div class="encabezado-seccion">
+
+
+                <div>
+
+                    <span class="mini-titulo">
+                        COLECCIÓN
+                    </span>
+
+                    <h2>
+                        Accesorios
+                    </h2>
+
+                </div>
+
+
+                <!-- AGREGAR ACCESORIO -->
+
+                <button type="button" class="btn-dorado" onclick="abrirModal()">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Agregar accesorio
+
+                </button>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 PRODUCTOS
+            ================================================== -->
+
+            <div id="productosAccesorios" class="productos">
+
+
+                <div class="sin-productos">
+
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+
+                    <h3>
+                        Cargando accesorios...
+                    </h3>
+
+                    <p>
+                        Conectando con Supabase...
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         MODAL PRODUCTO
+    ====================================================== -->
+
+    <div id="modalProducto" class="modal">
+
+
+        <div class="modal-contenido">
+
+
+            <!-- CERRAR -->
+
+            <button type="button" class="cerrar-modal" onclick="cerrarModal()" aria-label="Cerrar">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+
+
+            <!-- TÍTULO -->
+
+            <h2 id="tituloModal">
+                Agregar Accesorio
+            </h2>
+
+
+            <p class="subtitulo-modal">
+                Completa la información del accesorio.
+            </p>
+
+
+
+            <!-- =================================================
+                 FORMULARIO
+            ================================================== -->
+
+            <form id="formProducto">
+
+
+                <!-- =================================================
+                     IMAGEN
+                ================================================== -->
+
+                <div class="campo">
+
+                    <label for="imagenProducto">
+                        Imagen del producto
+                    </label>
+
+
+                    <input type="file" id="imagenProducto" accept="image/jpeg,image/png,image/webp">
+
+                </div>
+
+
+
+                <!-- =================================================
+                     VISTA PREVIA
+                ================================================== -->
+
+                <div id="vistaPrevia" class="vista-previa">
+
+                    <i class="fa-solid fa-image"></i>
+
+                    <p>
+                        Vista previa
+                    </p>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     NOMBRE
+                ================================================== -->
+
+                <div class="campo">
+
+                    <label for="nombreProducto">
+                        Nombre del accesorio
+                    </label>
+
+
+                    <input type="text" id="nombreProducto" placeholder="Ej. Accesorio DL Luxury" required>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     GÉNERO
+                ================================================== -->
+
+                <div class="campo">
+
+                    <label for="generoProducto">
+                        Para quién es
+                    </label>
+
+
+                    <select id="generoProducto" required>
+
+                        <option value="">
+                            Selecciona una opción
+                        </option>
+
+                        <option value="hombre">
+                            Hombre
+                        </option>
+
+                        <option value="mujer">
+                            Mujer
+                        </option>
+
+                        <option value="unisex">
+                            Unisex
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     DESCRIPCIÓN
+                ================================================== -->
+
+                <div class="campo">
+
+                    <label for="descripcionProducto">
+                        Descripción
+                    </label>
+
+
+                    <textarea id="descripcionProducto"
+                        placeholder="Describe el accesorio, material, características, detalles, etc."
+                        rows="5"></textarea>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     PRECIO
+                ================================================== -->
+
+                <div class="campo">
+
+                    <label for="precioProducto">
+                        Precio
+                    </label>
+
+
+                    <input type="number" id="precioProducto" placeholder="Q0.00" min="0" step="0.01" required>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     STOCK
+                ================================================== -->
+
+                <div class="campo">
+
+                    <label for="stockProducto">
+                        Cantidad disponible
+                    </label>
+
+
+                    <input type="number" id="stockProducto" placeholder="Ej. 10" min="0" step="1" required>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     BOTONES
+                ================================================== -->
+
+                <div class="botones-modal">
+
+
+                    <button type="button" class="btn-cancelar" onclick="cerrarModal()">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit" id="btnGuardarAccesorio" class="btn-dorado">
+
+                        <i class="fa-solid fa-save"></i>
+
+                        Guardar
+
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SUPABASE
+    ====================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <!-- =====================================================
+         ACCESORIOS JS
+    ====================================================== -->
+
+    <script src="accesorios.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DL Luxury - Descuentos</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+
+    <!-- =====================================================
+         BARRA LATERAL
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-dl">
+                DL
+            </div>
+
+            <div class="logo-luxury">
+                LUXURY
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <button class="menu" onclick="window.location.href='index.html'">
+
+                <i class="fa-solid fa-house"></i>
+
+                <span>Inicio</span>
+
+            </button>
+
+
+            <button class="menu" onclick="window.location.href='gorras.html'">
+
+                <i class="fa-solid fa-hat-cowboy"></i>
+
+                <span>Gorras</span>
+
+            </button>
+
+
+            <button class="menu" onclick="window.location.href='playeras.html'">
+
+                <i class="fa-solid fa-shirt"></i>
+
+                <span>Playeras</span>
+
+            </button>
+
+
+            <button class="menu" onclick="window.location.href='hoodies.html'">
+
+                <i class="fa-solid fa-shirt"></i>
+
+                <span>Hoodies</span>
+
+            </button>
+
+
+            <button class="menu" onclick="window.location.href='perfumes.html'">
+
+                <i class="fa-solid fa-spray-can-sparkles"></i>
+
+                <span>Perfumes</span>
+
+            </button>
+
+
+            <button class="menu" onclick="window.location.href='accesorios.html'">
+
+                <i class="fa-solid fa-motorcycle"></i>
+
+                <span>Accesorios</span>
+
+            </button>
+
+
+            <button class="menu active" onclick="window.location.href='descuentos.html'">
+
+                <i class="fa-solid fa-tag"></i>
+
+                <span>Descuentos</span>
+
+            </button>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL
+    ====================================================== -->
+
+    <main class="contenido">
+
+        <header class="topbar">
+
+            <h1>
+                Descuentos
+            </h1>
+
+
+            <div class="usuario">
+
+                <div class="usuario-icono">
+
+                    <i class="fa-solid fa-user"></i>
+
+                </div>
+
+                <span>
+                    Administrador
+                </span>
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             SECCIÓN DESCUENTOS
+        ================================================== -->
+
+        <section id="descuentos" class="seccion activa">
+
+            <div class="encabezado-seccion">
+
+                <div>
+
+                    <span class="mini-titulo">
+                        OFERTAS
+                    </span>
+
+                    <h2>
+                        Descuentos
+                    </h2>
+
+                </div>
+
+
+                <button type="button" class="btn-dorado" onclick="abrirModal()">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Agregar Descuento
+
+                </button>
+
+            </div>
+
+
+            <div id="productosDescuentos" class="productos">
+
+                <div class="sin-productos">
+
+                    <i class="fa-solid fa-box-open"></i>
+
+                    <h3>
+                        No hay descuentos
+                    </h3>
+
+                    <p>
+                        Agrega tu primera oferta.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         MODAL AGREGAR / EDITAR PRODUCTO
+    ====================================================== -->
+
+    <div id="modalProducto" class="modal">
+
+        <div class="modal-contenido">
+
+
+            <button type="button" class="cerrar-modal" onclick="cerrarModal()">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+
+            <h2 id="tituloModal">
+                Agregar Descuento
+            </h2>
+
+
+            <form id="formProducto">
+
+
+                <!-- IMAGEN -->
+
+                <div class="campo">
+
+                    <label for="imagenProducto">
+                        Imagen del producto
+                    </label>
+
+                    <input type="file" id="imagenProducto" name="imagen" accept="image/*">
+
+                </div>
+
+
+                <!-- VISTA PREVIA -->
+
+                <div id="vistaPrevia" class="vista-previa">
+
+                    <div id="vistaImagen">
+
+                        <i class="fa-solid fa-image"></i>
+
+                        <p>
+                            Vista previa
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- NOMBRE -->
+
+                <div class="campo">
+
+                    <label for="nombreProducto">
+                        Nombre del Producto
+                    </label>
+
+                    <input type="text" id="nombreProducto" name="nombre" placeholder="Ej. Playera Premium" required>
+
+                </div>
+
+
+                <!-- ÁREA -->
+
+                <div class="campo">
+
+                    <label for="generoProducto">
+                        Área
+                    </label>
+
+                    <select id="generoProducto" name="genero" required>
+
+                        <option value="">
+                            Seleccionar área
+                        </option>
+
+                        <option value="hombre">
+                            Hombre
+                        </option>
+
+                        <option value="mujer">
+                            Mujer
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- DESCRIPCIÓN -->
+
+                <div class="campo">
+
+                    <label for="descripcionProducto">
+                        Descripción
+                    </label>
+
+                    <textarea id="descripcionProducto" name="descripcion" rows="4"
+                        placeholder="Escribe una descripción del producto..."></textarea>
+
+                </div>
+
+
+                <!-- PRECIO ORIGINAL -->
+
+                <div class="campo">
+
+                    <label for="precioProducto">
+                        Precio Original
+                    </label>
+
+                    <input type="number" id="precioProducto" name="precio" placeholder="Q0.00" min="0" step="0.01"
+                        required>
+
+                </div>
+
+
+                <!-- DESCUENTO -->
+
+                <div class="campo">
+
+                    <label for="descuentoProducto">
+                        Descuento (%)
+                    </label>
+
+                    <input type="number" id="descuentoProducto" name="descuento" placeholder="Ej. 20" min="1" max="100"
+                        step="1" required>
+
+                </div>
+
+
+                <!-- PRECIO FINAL -->
+
+                <div class="campo">
+
+                    <label>
+                        Precio Final
+                    </label>
+
+                    <div id="precioFinal" class="precio-final">
+
+                        Q0.00
+
+                    </div>
+
+                </div>
+
+
+                <!-- STOCK -->
+
+                <div class="campo">
+
+                    <label for="stockProducto">
+                        Cantidad disponible
+                    </label>
+
+                    <input type="number" id="stockProducto" name="stock" placeholder="Ej. 10" min="0" step="1" required>
+
+                </div>
+
+
+                <!-- BOTONES -->
+
+                <div class="botones-modal">
+
+                    <button type="button" class="btn-cancelar" onclick="cerrarModal()">
+
+                        Cancelar
+
+                    </button>
+
+
+                    <button type="submit" class="btn-dorado">
+
+                        <i class="fa-solid fa-save"></i>
+
+                        Guardar
+
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MODAL DETALLE DEL PRODUCTO
+    ====================================================== -->
+
+    <div id="modalDetalle" class="modal">
+
+        <div class="modal-detalle-contenido">
+
+
+            <!-- CERRAR -->
+
+            <button type="button" class="cerrar-modal" onclick="cerrarDetalle()">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+
+            <!-- IMAGEN -->
+
+            <div class="detalle-imagen">
+
+                <img id="detalleImagen" src="" alt="Producto">
+
+            </div>
+
+
+            <!-- INFORMACIÓN -->
+
+            <div class="detalle-informacion">
+
+                <span class="detalle-etiqueta">
+                    OFERTA
+                </span>
+
+
+                <h2 id="detalleNombre">
+                    Producto
+                </h2>
+
+
+                <p id="detalleDescripcion">
+                    Descripción del producto
+                </p>
+
+
+                <div class="detalle-precios">
+
+                    <span id="detallePrecioOriginal">
+                        Q0.00
+                    </span>
+
+                    <strong id="detallePrecioFinal">
+                        Q0.00
+                    </strong>
+
+                </div>
+
+
+                <div class="detalle-descuento">
+
+                    <i class="fa-solid fa-tag"></i>
+
+                    <span id="detalleDescuento">
+                        0% de descuento
+                    </span>
+
+                </div>
+
+
+                <div class="detalle-stock">
+
+                    <i class="fa-solid fa-box"></i>
+
+                    <span id="detalleStock">
+                        Stock: 0
+                    </span>
+
+                </div>
+
+
+                <div class="detalle-area">
+
+                    <i class="fa-solid fa-user"></i>
+
+                    <span id="detalleGenero">
+                        Área
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUPABASE
+    ====================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="descuentos.js"></script>
+
+
+</body>
+
+</html>

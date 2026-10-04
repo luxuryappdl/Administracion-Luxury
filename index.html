@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="DL Luxury">
+
+    <title>DL Luxury - Administración</title>
+
+    <!-- CSS PRINCIPAL -->
+    <link rel="stylesheet" href="./style.css">
+
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- ESTILOS BOTÓN INSTALAR -->
+    <style>
+        #botonInstalarPWA {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            min-height: 42px;
+            margin-right: 12px;
+            padding: 0;
+            border: 1px solid rgba(212, 175, 55, .65);
+            border-radius: 50%;
+            background: #000;
+            color: #D4AF37;
+            cursor: pointer;
+            transition: all .25s ease;
+            font-size: 17px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 99999;
+        }
+
+        #botonInstalarPWA:hover {
+            background: #D4AF37;
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, .30);
+        }
+
+        #botonInstalarPWA:active {
+            transform: scale(.94);
+        }
+
+        #botonInstalarPWA i {
+            pointer-events: none;
+        }
+
+        #botonInstalarPWA::after {
+            content: "Instalar DL Luxury";
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: #111;
+            color: #fff;
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all .2s ease;
+            border: 1px solid rgba(212, 175, 55, .40);
+        }
+
+        #botonInstalarPWA:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .usuario {
+            display: flex;
+            align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            #botonInstalarPWA {
+                width: 38px;
+                height: 38px;
+                min-width: 38px;
+                min-height: 38px;
+                margin-right: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-dl">DL</div>
+            <div class="logo-luxury">LUXURY</div>
+        </div>
+
+        <nav>
+            <button class="menu active" onclick="mostrarSeccion('inicio', this)">
+                <i class="fa-solid fa-house"></i>
+                <span>Inicio</span>
+            </button>
+
+            <button class="menu" onclick="window.location.href='gorras.html'">
+                <i class="fa-solid fa-hat-cowboy"></i>
+                <span>Gorras</span>
+            </button>
+
+            <button class="menu" onclick="window.location.href='playeras.html'">
+                <i class="fa-solid fa-shirt"></i>
+                <span>Playeras</span>
+            </button>
+
+            <button class="menu" onclick="window.location.href='hoodies.html'">
+                <i class="fa-solid fa-vest"></i>
+                <span>Hoodies</span>
+            </button>
+
+            <button class="menu" onclick="window.location.href='perfumes.html'">
+                <i class="fa-solid fa-spray-can-sparkles"></i>
+                <span>Perfumes</span>
+            </button>
+
+            <button class="menu" onclick="window.location.href='accesorios.html'">
+                <i class="fa-solid fa-gem"></i>
+                <span>Accesorios</span>
+            </button>
+
+            <button class="menu" onclick="window.location.href='descuentos.html'">
+                <i class="fa-solid fa-tags"></i>
+                <span>Descuentos</span>
+            </button>
+        </nav>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <h1>DL Luxury</h1>
+
+            <div class="usuario">
+                <button id="botonInstalarPWA" type="button" aria-label="Instalar DL Luxury" title="Instalar DL Luxury">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+
+                <div class="usuario-icono">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <span>Administrador</span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+        </header>
+
+        <!-- INICIO -->
+        <section id="inicio" class="seccion activa">
+
+            <div class="inicio-contenido">
+                <div class="texto-inicio">
+                    <span class="mini-titulo">PANEL DE ADMINISTRACIÓN</span>
+
+                    <h2>
+                        Bienvenido a
+                        <span>DL Luxury</span>
+                    </h2>
+
+                    <p>
+                        Administra tus productos, pedidos,
+                        inventario y rendimiento desde un solo lugar.
+                    </p>
+                </div>
+
+                <div class="logo-grande">
+                    <strong>DL</strong>
+                    <span>LUXURY</span>
+                    <small>ADMINISTRATION</small>
+                </div>
+            </div>
+
+            <!-- DASHBOARD -->
+            <div class="encabezado-seccion">
+                <div>
+                    <span class="mini-titulo">RESUMEN</span>
+                    <h2>Dashboard</h2>
+                </div>
+            </div>
+
+            <!-- MÉTRICAS -->
+            <div class="metricas-grid">
+
+                <div class="card-metrica">
+                    <div class="metrica-info">
+                        <span>Ventas</span>
+                        <h3 id="totalVentas">Q0.00</h3>
+                    </div>
+                    <div class="metrica-icono verde">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                </div>
+
+                <div class="card-metrica">
+                    <div class="metrica-info">
+                        <span>Ingresos</span>
+                        <h3 id="totalIngresos">Q0.00</h3>
+                    </div>
+                    <div class="metrica-icono azul">
+                        <i class="fa-solid fa-money-bill-trend-up"></i>
+                    </div>
+                </div>
+
+                <div class="card-metrica">
+                    <div class="metrica-info">
+                        <span>Egresos</span>
+                        <h3 id="totalEgresos">Q0.00</h3>
+                    </div>
+                    <div class="metrica-icono morado">
+                        <i class="fa-solid fa-money-bill-transfer"></i>
+                    </div>
+                </div>
+
+                <div class="card-metrica">
+                    <div class="metrica-info">
+                        <span>Ganancia</span>
+                        <h3 id="gananciaTotal">Q0.00</h3>
+                    </div>
+                    <div class="metrica-icono dorado">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                </div>
+
+                <div class="card-metrica">
+                    <div class="metrica-info">
+                        <span>Productos vendidos</span>
+                        <h3 id="productosVendidos">0</h3>
+                    </div>
+                    <div class="metrica-icono dorado">
+                        <i class="fa-solid fa-box"></i>
+                    </div>
+                </div>
+
+                <div class="card-metrica">
+                    <div class="metrica-info">
+                        <span>Total de productos</span>
+                        <h3 id="totalProductos">0</h3>
+                    </div>
+                    <div class="metrica-icono dorado">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </div>
+                </div>
+
+                <div class="card-metrica">
+                    <div class="metrica-info">
+                        <span>Stock disponible</span>
+                        <h3 id="stockTotal">0</h3>
+                    </div>
+                    <div class="metrica-icono verde">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </div>
+                </div>
+
+                <div class="card-metrica">
+                    <div class="metrica-info">
+                        <span>Stock bajo</span>
+                        <h3 id="stockBajo">0</h3>
+                    </div>
+                    <div class="metrica-icono morado">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SELECTOR DE AÑO -->
+            <div class="selector-año-container">
+                <div class="selector-año-info">
+                    <i class="fa-solid fa-calendar"></i>
+
+                    <div>
+                        <span>AÑO SELECCIONADO</span>
+                        <strong id="añoActual">2026</strong>
+                    </div>
+                </div>
+
+                <div class="selector-año">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <select id="selectorAño"></select>
+                </div>
+            </div>
+
+            <!-- PEDIDOS -->
+            <div class="encabezado-seccion" style="margin-top:40px">
+                <div>
+                    <span class="mini-titulo">PEDIDOS</span>
+                    <h2>Pedidos de clientes</h2>
+                </div>
+            </div>
+
+            <div class="ventas-recientes">
+                <h3>
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    Pedidos recibidos
+                </h3>
+
+                <div id="listaPedidos"></div>
+            </div>
+
+            <!-- INVENTARIO -->
+            <div class="encabezado-seccion inventario-inicio" style="margin-top:40px">
+                <div>
+                    <span class="mini-titulo">INVENTARIO</span>
+                    <h2>Inventario de productos</h2>
+                </div>
+            </div>
+
+            <div class="ventas-recientes">
+                <h3>
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    Stock actual
+                </h3>
+
+                <table class="tabla-ventas">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="listaStock"></tbody>
+                </table>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- INSTALACIÓN PWA -->
+    <script>
+        (() => {
+            let deferredPrompt = null;
+
+            const boton = document.getElementById("botonInstalarPWA");
+
+            function estaInstaladaComoPWA() {
+                return (
+                    window.matchMedia("(display-mode: standalone)").matches ||
+                    window.navigator.standalone === true
+                );
+            }
+
+            function actualizarBoton() {
+                if (!boton) return;
+
+                if (estaInstaladaComoPWA()) {
+                    boton.title = "DL Luxury ya está instalada";
+                    boton.setAttribute(
+                        "aria-label",
+                        "DL Luxury ya está instalada"
+                    );
+                } else if (deferredPrompt) {
+                    boton.title = "Instalar DL Luxury";
+                    boton.setAttribute(
+                        "aria-label",
+                        "Instalar DL Luxury"
+                    );
+                } else {
+                    boton.title = "Opciones de instalación";
+                    boton.setAttribute(
+                        "aria-label",
+                        "Ver opciones de instalación"
+                    );
+                }
+            }
+
+            window.addEventListener("beforeinstallprompt", event => {
+                event.preventDefault();
+                deferredPrompt = event;
+
+                console.log("DL Luxury: instalación disponible.");
+                actualizarBoton();
+            });
+
+            window.addEventListener("appinstalled", () => {
+                deferredPrompt = null;
+
+                console.log("DL Luxury: aplicación instalada.");
+                actualizarBoton();
+            });
+
+            if (boton) {
+                boton.addEventListener("click", async () => {
+                    if (estaInstaladaComoPWA()) {
+                        alert("DL Luxury ya está instalada en este dispositivo.");
+                        return;
+                    }
+
+                    if (deferredPrompt) {
+                        const eventoInstalacion = deferredPrompt;
+                        deferredPrompt = null;
+
+                        eventoInstalacion.prompt();
+
+                        try {
+                            const resultado =
+                                await eventoInstalacion.userChoice;
+
+                            console.log(
+                                "Resultado de instalación:",
+                                resultado.outcome
+                            );
+                        } catch (error) {
+                            console.error(
+                                "No se pudo completar la instalación:",
+                                error
+                            );
+                        }
+
+                        actualizarBoton();
+                        return;
+                    }
+
+                    alert(
+                        "El navegador todavía no ofrece la instalación automática.\n\n" +
+                        "Comprueba que estés usando HTTPS, que manifest.json y " +
+                        "service-worker.js se carguen correctamente y que la " +
+                        "aplicación cumpla los requisitos de instalación.\n\n" +
+                        "También puedes revisar el menú del navegador y buscar " +
+                        "'Instalar página como aplicación' o una opción similar."
+                    );
+                });
+            }
+
+            actualizarBoton();
+        })();
+    </script>
+
+    <!-- SCRIPTS DE ADMINISTRACIÓN -->
+    <script src="./script.js"></script>
+    <script src="./adonvent.js"></script>
+    <script src="./admin.js"></script>
+    <script src="./pedidos-admin.js"></script>
+    <script src="./anos.js"></script>
+
+    <!-- SERVICE WORKER PWA -->
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", async () => {
+                try {
+                    const registro =
+                        await navigator.serviceWorker.register(
+                            "./service-worker.js"
+                        );
+
+                    console.log(
+                        "DL Luxury: Service Worker registrado correctamente.",
+                        registro.scope
+                    );
+
+                    registro.addEventListener("updatefound", () => {
+                        console.log(
+                            "DL Luxury: hay una actualización del Service Worker."
+                        );
+                    });
+                } catch (error) {
+                    console.error(
+                        "DL Luxury: error al registrar Service Worker:",
+                        error
+                    );
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>
