@@ -1,32 +1,18 @@
 /* =========================================================
    DL LUXURY
    PEDIDOS - ADMINISTRACIÓN
+   =========================================================
+   
+   SISTEMA DE PUNTOS
 
-   ESTE ARCHIVO MANEJA ÚNICAMENTE:
+   Q1   - Q10    = 1 punto
+   Q11  - Q20    = 2 puntos
+   Q21  - Q30    = 3 puntos
+   ...
+   Q190 - Q200   = 20 puntos
+   Q200+         = 20 puntos máximo
 
-   - Mostrar pedidos
-   - Confirmar compra
-   - Dar puntos
-   - Validar puntos
-
-   NO MODIFICA:
-   - Dashboard
-   - Ingresos
-   - Ventas
-   - Egresos
-   - Stock
-
-   REGLA DE PUNTOS:
-
-   Q149  = 0 puntos
-   Q150  = 5 puntos
-   Q300  = 10 puntos
-   Q450  = 15 puntos
-   Q600  = 20 puntos
-
-   FÓRMULA:
-
-   Math.floor(total / 150) * 5
+   MÁXIMO: 20 PUNTOS POR PEDIDO
 ========================================================= */
 
 
@@ -40,7 +26,6 @@ const SUPABASE_PEDIDOS_URL =
 const SUPABASE_PEDIDOS_KEY =
     "sb_publishable_Qdae9GUtmuosAPP4kemF3A_Vr4HFo0n";
 
-
 const supabasePedidos =
     window.supabase.createClient(
         SUPABASE_PEDIDOS_URL,
@@ -49,361 +34,229 @@ const supabasePedidos =
 
 
 /* =========================================================
-   UTILIDADES
+   ESCAPAR HTML
 ========================================================= */
 
-function escaparHTMLPedidos(texto) {
+function escaparHTMLPedidos(valor) {
 
-    return String(texto ?? "")
+    return String(valor ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
-
 }
 
 
-function escaparHTML(texto) {
+function escaparHTML(valor) {
 
-    return escaparHTMLPedidos(texto);
-
-}
-
-
-function dineroPedido(numero) {
-
-    const valor =
-        Number(numero);
-
-    return "Q" +
-        (
-            Number.isFinite(valor)
-                ? valor
-                : 0
-        ).toFixed(2);
-
-}
-
-
-function formatearFechaPedido(fecha) {
-
-    if (!fecha) {
-        return "";
-    }
-
-
-    const fechaObj =
-        new Date(fecha);
-
-
-    if (
-        Number.isNaN(
-            fechaObj.getTime()
-        )
-    ) {
-
-        return "";
-    }
-
-
-    return fechaObj.toLocaleDateString(
-        "es-GT",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        }
-    );
-
-}
-
-
-function formatearHoraPedido(fecha) {
-
-    if (!fecha) {
-        return "";
-    }
-
-
-    const fechaObj =
-        new Date(fecha);
-
-
-    if (
-        Number.isNaN(
-            fechaObj.getTime()
-        )
-    ) {
-
-        return "";
-    }
-
-
-    return fechaObj.toLocaleTimeString(
-        "es-GT",
-        {
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
-
+    return escaparHTMLPedidos(valor);
 }
 
 
 /* =========================================================
-   OBTENER AÑO SELECCIONADO
+   DINERO
+========================================================= */
+
+function dineroPedido(valor) {
+
+    const numero = Number(valor) || 0;
+
+    return numero.toLocaleString("es-GT", {
+        style: "currency",
+        currency: "GTQ",
+        minimumFractionDigits: 2
+    });
+}
+
+
+/* =========================================================
+   FECHA
+========================================================= */
+
+function formatearFechaPedido(fecha) {
+
+    if (!fecha) return "Sin fecha";
+
+    const fechaObj = new Date(fecha);
+
+    if (Number.isNaN(fechaObj.getTime())) {
+        return "Sin fecha";
+    }
+
+    return fechaObj.toLocaleDateString("es-GT", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    });
+}
+
+
+/* =========================================================
+   HORA
+========================================================= */
+
+function formatearHoraPedido(fecha) {
+
+    if (!fecha) return "";
+
+    const fechaObj = new Date(fecha);
+
+    if (Number.isNaN(fechaObj.getTime())) {
+        return "";
+    }
+
+    return fechaObj.toLocaleTimeString("es-GT", {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+
+/* =========================================================
+   AÑO SELECCIONADO
 ========================================================= */
 
 function obtenerAñoSeleccionadoPedidos() {
 
-    const selector =
-        document.getElementById(
-            "selectorAño"
-        );
+    const selector = document.getElementById("selectorAño");
+
+    if (!selector) {
+        return new Date().getFullYear();
+    }
+
+    const valor = Number(selector.value);
+
+    return valor || new Date().getFullYear();
+}
 
 
-    /*
-       SI EL SELECTOR EXISTE Y TIENE
-       UN AÑO SELECCIONADO, USAMOS ESE.
-    */
+/* =========================================================
+   PRODUCTOS DEL PEDIDO
+========================================================= */
 
-    if (
-        selector &&
-        selector.value
-    ) {
+function obtenerProductosPedidoAdmin(pedido) {
 
-        const añoSelect =
-            Number(
-                selector.value
+    if (!pedido) return [];
+
+    let productos = pedido.productos;
+
+    if (!productos) {
+        return [];
+    }
+
+    if (typeof productos === "string") {
+
+        try {
+
+            productos = JSON.parse(productos);
+
+        } catch (error) {
+
+            console.warn(
+                "No se pudo convertir productos:",
+                error
             );
 
+            return [];
+        }
+    }
 
-        if (
-            Number.isFinite(añoSelect) &&
-            añoSelect >= 1900
-        ) {
+    if (!Array.isArray(productos)) {
 
-            return añoSelect;
-
+        if (typeof productos === "object") {
+            return [productos];
         }
 
+        return [];
     }
 
-
-    /*
-       SI TODAVÍA NO TENEMOS VALOR
-       EN EL SELECTOR, BUSCAMOS
-       EL AÑO GUARDADO.
-    */
-
-    const añoGuardado =
-        Number(
-            localStorage.getItem(
-                "dlLuxuryAñoSeleccionado"
-            )
-        );
-
-
-    if (
-        Number.isFinite(añoGuardado) &&
-        añoGuardado >= 1900
-    ) {
-
-        return añoGuardado;
-
-    }
-
-
-    /*
-       ÚLTIMO RECURSO:
-       AÑO ACTUAL.
-    */
-
-    return new Date().getFullYear();
-
+    return productos;
 }
 
 
 /* =========================================================
-   OBTENER PRODUCTOS DEL PEDIDO
+   CANTIDAD
 ========================================================= */
 
-function obtenerProductosPedidoAdmin(
-    pedido
-) {
+function obtenerCantidadPedidoAdmin(pedido) {
 
-    let productos = [];
+    const productos = obtenerProductosPedidoAdmin(pedido);
 
-
-    try {
-
-        if (
-            Array.isArray(
-                pedido?.productos
-            )
-        ) {
-
-            productos =
-                pedido.productos;
-
-        }
-
-        else if (
-            typeof pedido?.productos === "string"
-        ) {
-
-            productos =
-                JSON.parse(
-                    pedido.productos
-                );
-
-        }
-
-        else if (
-            pedido?.productos &&
-            typeof pedido.productos === "object"
-        ) {
-
-            productos = [
-                pedido.productos
-            ];
-
-        }
-
+    if (!productos.length) {
+        return 0;
     }
 
-    catch (error) {
+    return productos.reduce((total, producto) => {
 
-        console.error(
-            "Error leyendo productos del pedido:",
-            error
-        );
+        const cantidad =
+            Number(
+                producto?.cantidad ??
+                producto?.qty ??
+                producto?.quantity ??
+                1
+            ) || 1;
 
-        productos = [];
+        return total + cantidad;
 
-    }
-
-
-    return Array.isArray(productos)
-        ? productos
-        : [];
-
+    }, 0);
 }
 
 
 /* =========================================================
-   CANTIDAD DE PRODUCTOS
+   TOTAL
 ========================================================= */
 
-function obtenerCantidadPedidoAdmin(
-    pedido
-) {
+function obtenerTotalPedidoAdmin(pedido) {
 
-    const productos =
-        obtenerProductosPedidoAdmin(
-            pedido
-        );
+    if (!pedido) return 0;
 
+    const posiblesValores = [
+        pedido.total,
+        pedido.total_pedido,
+        pedido.monto_total,
+        pedido.precio_total
+    ];
 
-    let cantidad = 0;
+    for (const valor of posiblesValores) {
 
+        const numero = Number(valor);
 
-    productos.forEach(
-        function (producto) {
-
-            cantidad +=
-                Number(
-                    producto?.cantidad
-                ) || 1;
-
+        if (Number.isFinite(numero)) {
+            return numero;
         }
-    );
-
-
-    return cantidad;
-
-}
-
-
-/* =========================================================
-   TOTAL DEL PEDIDO
-========================================================= */
-
-function obtenerTotalPedidoAdmin(
-    pedido
-) {
-
-    const total =
-        Number(
-            pedido?.total
-        );
-
-
-    if (
-        Number.isFinite(total)
-    ) {
-
-        return total;
-
     }
 
-
-    const productos =
-        obtenerProductosPedidoAdmin(
-            pedido
-        );
-
-
-    let totalCalculado = 0;
-
-
-    productos.forEach(
-        function (producto) {
-
-            const precio =
-                Number(
-                    producto?.precio ??
-                    producto?.price ??
-                    producto?.precio_final ??
-                    0
-                );
-
-
-            const cantidad =
-                Number(
-                    producto?.cantidad
-                ) || 1;
-
-
-            totalCalculado +=
-                precio * cantidad;
-
-        }
-    );
-
-
-    return totalCalculado;
-
+    return 0;
 }
 
 
 /* =========================================================
    CALCULAR PUNTOS
+=========================================================
+
+   NUEVA REGLA:
+
+   Q1  - Q10   = 1 punto
+   Q11 - Q20   = 2 puntos
+   Q21 - Q30   = 3 puntos
+
+   ...
+
+   MÁXIMO = 20 puntos
 ========================================================= */
 
-function calcularPuntosPedidoAdmin(
-    total
-) {
+function calcularPuntosPedidoAdmin(total) {
 
-    const valor =
-        Number(total) || 0;
+    const valor = Number(total) || 0;
 
+    if (valor <= 0) {
+        return 0;
+    }
 
-    return Math.floor(
-        valor / 150
-    ) * 5;
+    const puntos = Math.ceil(valor / 10);
 
+    return Math.min(puntos, 20);
 }
 
 
@@ -411,9 +264,7 @@ function calcularPuntosPedidoAdmin(
    OBTENER ID DEL USUARIO
 ========================================================= */
 
-function obtenerUsuarioIdPedido(
-    pedido
-) {
+function obtenerUsuarioIdPedido(pedido) {
 
     return (
         pedido?.usuario_id ||
@@ -423,7 +274,6 @@ function obtenerUsuarioIdPedido(
         pedido?.cliente ||
         null
     );
-
 }
 
 
@@ -431,204 +281,196 @@ function obtenerUsuarioIdPedido(
    OBTENER NOMBRE DEL CLIENTE
 ========================================================= */
 
-async function obtenerNombreClientePedido(
-    pedido
-) {
-
-    const usuarioId =
-        obtenerUsuarioIdPedido(
-            pedido
-        );
-
-
-    const nombreDirecto =
-        pedido?.nombre ||
-        pedido?.cliente_nombre ||
-        pedido?.nombre_cliente;
-
-
-    if (nombreDirecto) {
-
-        return nombreDirecto;
-
-    }
-
-
-    if (!usuarioId) {
-
-        return "Cliente";
-
-    }
-
-
-    try {
-
-        const {
-            data,
-            error
-        } =
-            await supabasePedidos
-                .from("perfiles")
-                .select(
-                    "nombre,apellido,correo"
-                )
-                .eq(
-                    "id",
-                    usuarioId
-                )
-                .maybeSingle();
-
-
-        if (error) {
-
-            console.warn(
-                "No se pudo obtener el perfil:",
-                error
-            );
-
-            return (
-                pedido?.correo ||
-                pedido?.cliente_correo ||
-                "Cliente"
-            );
-
-        }
-
-
-        if (data) {
-
-            const nombre =
-                data.nombre || "";
-
-
-            const apellido =
-                data.apellido || "";
-
-
-            const nombreCompleto =
-                `${nombre} ${apellido}`.trim();
-
-
-            if (nombreCompleto) {
-
-                return nombreCompleto;
-
-            }
-
-
-            if (data.correo) {
-
-                return data.correo;
-
-            }
-
-        }
-
-    }
-
-    catch (error) {
-
-        console.warn(
-            "Error buscando cliente:",
-            error
-        );
-
-    }
-
+function obtenerNombreClientePedido(pedido) {
 
     return (
-        pedido?.correo ||
-        pedido?.cliente_correo ||
+        pedido?.cliente_nombre ||
+        pedido?.nombre_cliente ||
+        pedido?.cliente ||
+        pedido?.nombre ||
+        pedido?.usuario_nombre ||
         "Cliente"
     );
-
 }
 
 
 /* =========================================================
-   OBTENER CORREO DEL CLIENTE
+   OBTENER CORREO
 ========================================================= */
 
-async function obtenerCorreoClientePedido(
-    pedido
-) {
+function obtenerCorreoClientePedido(pedido) {
 
-    const correoDirecto =
+    return (
+        pedido?.cliente_correo ||
         pedido?.correo ||
-        pedido?.cliente_correo;
+        pedido?.email ||
+        pedido?.correo_cliente ||
+        ""
+    );
+}
 
 
-    if (correoDirecto) {
+/* =========================================================
+   BUSCAR PERFIL DEL CLIENTE
+========================================================= */
 
-        return correoDirecto;
+async function buscarPerfilClientePedido(pedido) {
 
+    /*
+       1. Primero intentamos encontrarlo por ID.
+    */
+
+    const posiblesIds = [
+        pedido?.usuario_id,
+        pedido?.user_id,
+        pedido?.cliente_id,
+        pedido?.usuario,
+        pedido?.cliente
+    ].filter(Boolean);
+
+
+    for (const id of posiblesIds) {
+
+        try {
+
+            const { data, error } =
+                await supabasePedidos
+                    .from("perfiles")
+                    .select("*")
+                    .eq("id", id)
+                    .maybeSingle();
+
+            if (error) {
+
+                console.warn(
+                    "Error buscando perfil por ID:",
+                    error
+                );
+
+                continue;
+            }
+
+            if (data) {
+
+                return {
+                    perfil: data,
+                    id: data.id
+                };
+            }
+
+        } catch (error) {
+
+            console.warn(
+                "Error buscando perfil:",
+                error
+            );
+        }
     }
 
 
-    const usuarioId =
-        obtenerUsuarioIdPedido(
-            pedido
-        );
+    /*
+       2. Si no encontramos por ID,
+          buscamos por correo.
+    */
+
+    const correoPedido =
+        obtenerCorreoClientePedido(pedido)
+            .trim()
+            .toLowerCase();
 
 
-    if (!usuarioId) {
+    if (!correoPedido) {
 
-        return "";
-
+        return {
+            perfil: null,
+            id: null
+        };
     }
 
+
+    /*
+       IMPORTANTE:
+       No usamos .eq("correo") directamente porque
+       no sabemos si la tabla tiene esa columna.
+
+       Traemos los perfiles y buscamos en JS.
+    */
 
     try {
 
-        const {
-            data,
-            error
-        } =
+        const { data, error } =
             await supabasePedidos
                 .from("perfiles")
-                .select(
-                    "correo"
-                )
-                .eq(
-                    "id",
-                    usuarioId
-                )
-                .maybeSingle();
-
-
-        if (
-            !error &&
-            data?.correo
-        ) {
-
-            return data.correo;
-
-        }
-
+                .select("*");
 
         if (error) {
 
-            console.warn(
-                "No se pudo obtener correo:",
+            console.error(
+                "Error consultando perfiles:",
                 error
             );
 
+            return {
+                perfil: null,
+                id: null,
+                error
+            };
         }
 
-    }
 
-    catch (error) {
+        const perfiles = data || [];
 
-        console.warn(
-            "Error obteniendo correo:",
+
+        const perfilEncontrado =
+            perfiles.find(perfil => {
+
+                const correos = [
+
+                    perfil?.correo,
+                    perfil?.email,
+                    perfil?.correo_electronico,
+                    perfil?.email_usuario
+
+                ]
+                    .filter(Boolean)
+                    .map(correo =>
+                        String(correo)
+                            .trim()
+                            .toLowerCase()
+                    );
+
+                return correos.includes(correoPedido);
+            });
+
+
+        if (perfilEncontrado) {
+
+            return {
+                perfil: perfilEncontrado,
+                id: perfilEncontrado.id
+            };
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Error buscando cliente por correo:",
             error
         );
 
+        return {
+            perfil: null,
+            id: null,
+            error
+        };
     }
 
 
-    return "";
-
+    return {
+        perfil: null,
+        id: null
+    };
 }
 
 
@@ -639,46 +481,42 @@ async function obtenerCorreoClientePedido(
 async function cargarPedidosAdministracion() {
 
     const contenedor =
-        document.getElementById(
-            "listaPedidos"
-        );
-
+        document.getElementById("listaPedidos");
 
     if (!contenedor) {
-
         return;
-
     }
 
 
     contenedor.innerHTML = `
-        <div class="sin-productos">
-
-            <i class="fa-solid fa-spinner fa-spin"></i>
-
-            <h3>
-                Cargando pedidos...
-            </h3>
-
+        <div class="sin-tickets">
+            Cargando pedidos...
         </div>
     `;
 
 
     try {
 
-        const {
-            data,
-            error
-        } =
+        const año =
+            obtenerAñoSeleccionadoPedidos();
+
+
+        const inicio =
+            `${año}-01-01T00:00:00.000Z`;
+
+        const fin =
+            `${año + 1}-01-01T00:00:00.000Z`;
+
+
+        const { data, error } =
             await supabasePedidos
                 .from("pedidos")
                 .select("*")
-                .order(
-                    "creado_en",
-                    {
-                        ascending: false
-                    }
-                );
+                .gte("creado_en", inicio)
+                .lt("creado_en", fin)
+                .order("creado_en", {
+                    ascending: false
+                });
 
 
         if (error) {
@@ -688,710 +526,323 @@ async function cargarPedidosAdministracion() {
                 error
             );
 
-
             contenedor.innerHTML = `
-                <div class="sin-productos">
-
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-
-                    <h3>
-                        Error al cargar pedidos
-                    </h3>
-
-                    <p>
-                        ${escaparHTML(
-                error.message
-            )}
-                    </p>
-
+                <div class="sin-tickets">
+                    Error al cargar los pedidos.
+                    <br>
+                    ${escaparHTMLPedidos(error.message)}
                 </div>
             `;
 
             return;
-
         }
 
 
-        let pedidos =
-            data || [];
-
-
-        /* =================================================
-           OBTENER AÑO
-        ================================================= */
-
-        const añoSeleccionado =
-            obtenerAñoSeleccionadoPedidos();
-
-
-        console.log(
-            "AÑO SELECCIONADO:",
-            añoSeleccionado
-        );
-
-
-        /* =================================================
-           FILTRAR POR AÑO
-        ================================================= */
-
-        pedidos =
-            pedidos.filter(
-                function (pedido) {
-
-                    if (
-                        !pedido.creado_en
-                    ) {
-
-                        return false;
-
-                    }
-
-
-                    const fechaPedido =
-                        new Date(
-                            pedido.creado_en
-                        );
-
-
-                    if (
-                        Number.isNaN(
-                            fechaPedido.getTime()
-                        )
-                    ) {
-
-                        return false;
-
-                    }
-
-
-                    const añoPedido =
-                        fechaPedido.getFullYear();
-
-
-                    console.log(
-                        "Pedido:",
-                        pedido.id,
-                        "Año:",
-                        añoPedido
-                    );
-
-
-                    return (
-                        añoPedido ===
-                        añoSeleccionado
-                    );
-
-                }
-            );
-
-
-        contenedor.innerHTML = "";
-
-
-        if (
-            pedidos.length === 0
-        ) {
+        if (!data || !data.length) {
 
             contenedor.innerHTML = `
-                <div class="sin-productos">
-
-                    <i class="fa-solid fa-cart-shopping"></i>
-
-                    <h3>
-                        No hay pedidos
-                    </h3>
-
-                    <p>
-                        No hay pedidos registrados
-                        para ${añoSeleccionado}.
-                    </p>
-
+                <div class="sin-tickets">
+                    No hay pedidos para ${año}.
                 </div>
             `;
 
             return;
-
         }
 
 
-        for (
-            const pedido of pedidos
-        ) {
+        contenedor.innerHTML =
+            data
+                .map(crearTarjetaPedidoAdmin)
+                .join("");
 
-            await crearTarjetaPedidoAdmin(
-                pedido,
-                contenedor
-            );
 
-        }
-
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "Error inesperado cargando pedidos:",
             error
         );
 
-
         contenedor.innerHTML = `
-            <div class="sin-productos">
-
-                <i class="fa-solid fa-triangle-exclamation"></i>
-
-                <h3>
-                    Error al cargar pedidos
-                </h3>
-
-                <p>
-                    ${escaparHTML(
-            error.message
-        )}
-                </p>
-
+            <div class="sin-tickets">
+                Ocurrió un error al cargar los pedidos.
+                <br>
+                ${escaparHTMLPedidos(error.message)}
             </div>
         `;
-
     }
-
 }
 
 
 /* =========================================================
-   CREAR TARJETA DEL PEDIDO
+   CREAR TARJETA
 ========================================================= */
 
-async function crearTarjetaPedidoAdmin(
-    pedido,
-    contenedor
-) {
+function crearTarjetaPedidoAdmin(pedido) {
 
-    const tarjeta =
-        document.createElement(
-            "div"
-        );
+    const id =
+        pedido?.id ?? "";
 
+    const nombre =
+        obtenerNombreClientePedido(pedido);
 
-    tarjeta.className =
-        "producto-card";
+    const correo =
+        obtenerCorreoClientePedido(pedido);
 
+    const fecha =
+        formatearFechaPedido(pedido?.creado_en);
 
-    const nombreCliente =
-        await obtenerNombreClientePedido(
-            pedido
-        );
+    const hora =
+        formatearHoraPedido(pedido?.creado_en);
 
-
-    const correoCliente =
-        await obtenerCorreoClientePedido(
-            pedido
-        );
-
-
-    const total =
-        obtenerTotalPedidoAdmin(
-            pedido
-        );
-
+    const productos =
+        obtenerProductosPedidoAdmin(pedido);
 
     const cantidad =
-        obtenerCantidadPedidoAdmin(
-            pedido
-        );
+        obtenerCantidadPedidoAdmin(pedido);
+
+    const total =
+        obtenerTotalPedidoAdmin(pedido);
+
+    const puntos =
+        calcularPuntosPedidoAdmin(total);
+
+    const estado =
+        String(pedido?.estado || "pendiente")
+            .toLowerCase();
 
 
-    const confirmado =
-        String(
-            pedido.estado || ""
-        ).toLowerCase() ===
-        "confirmada";
+    const confirmada =
+        estado === "confirmada";
 
 
     const puntosValidados =
-        pedido.puntos_validados === true;
+        pedido?.puntos_validados === true;
 
 
-    const puntosGenerados =
-        Number(
-            pedido.puntos_generados
-        ) || 0;
+    let productosHTML = "";
 
 
-    const productos =
-        obtenerProductosPedidoAdmin(
-            pedido
-        );
+    if (productos.length) {
 
-
-    let listaProductos = "";
-
-
-    if (
-        productos.length > 0
-    ) {
-
-        listaProductos =
+        productosHTML =
             productos
-                .map(
-                    function (producto) {
+                .map(producto => {
 
-                        const nombre =
-                            producto?.nombre ||
-                            producto?.name ||
-                            "Producto";
-
-
-                        const cantidadProducto =
-                            Number(
-                                producto?.cantidad
-                            ) || 1;
+                    const nombreProducto =
+                        producto?.nombre ||
+                        producto?.producto ||
+                        "Producto";
 
 
-                        return `
-                            <div style="
-                                margin:5px 0;
-                                color:#ccc;
-                            ">
+                    const cantidadProducto =
+                        Number(
+                            producto?.cantidad ??
+                            producto?.qty ??
+                            producto?.quantity ??
+                            1
+                        ) || 1;
 
-                                <i class="fa-solid fa-box"></i>
 
-                                ${escaparHTML(
-                            nombre
-                        )}
+                    return `
+                        <div>
+                            ${escaparHTMLPedidos(nombreProducto)}
+                            × ${cantidadProducto}
+                        </div>
+                    `;
 
-                                × ${cantidadProducto}
-
-                            </div>
-                        `;
-
-                    }
-                )
+                })
                 .join("");
 
-    }
+    } else {
 
-    else {
-
-        listaProductos = `
-            <div style="color:#888;">
-                Sin productos detallados
-            </div>
-        `;
-
+        productosHTML =
+            `<div>Sin productos registrados</div>`;
     }
 
 
-    /* =====================================================
-       ESTADO
-    ===================================================== */
-
-    let estadoHTML = "";
-
-
-    if (confirmado) {
-
-        estadoHTML = `
-            <span style="
-                display:inline-block;
-                padding:6px 10px;
-                border-radius:6px;
-                background:#173a20;
-                color:#8ee59c;
-                font-size:13px;
-            ">
-
-                <i class="fa-solid fa-circle-check"></i>
-
-                Compra confirmada
-
-            </span>
-        `;
-
-    }
-
-    else {
-
-        estadoHTML = `
-            <span style="
-                display:inline-block;
-                padding:6px 10px;
-                border-radius:6px;
-                background:#3a2e17;
-                color:#d8b56a;
-                font-size:13px;
-            ">
-
-                <i class="fa-solid fa-clock"></i>
-
-                Pendiente
-
-            </span>
-        `;
-
-    }
-
-
-    /* =====================================================
-       BOTÓN CONFIRMAR
-    ===================================================== */
-
-    let botonConfirmar = "";
-
-
-    if (!confirmado) {
-
-        botonConfirmar = `
-            <button
-                type="button"
-                onclick="confirmarCompraPedido('${escaparHTML(
-            pedido.id
-        )}')"
-                style="
-                    border:none;
-                    cursor:pointer;
-                    padding:10px 15px;
-                    border-radius:7px;
-                    background:#d8b56a;
-                    color:#111;
-                    font-weight:bold;
-                    margin-right:8px;
-                "
-            >
-
-                <i class="fa-solid fa-check"></i>
-
-                Confirmar compra
-
-            </button>
-        `;
-
-    }
-
-    else {
-
-        botonConfirmar = `
-            <button
-                type="button"
-                disabled
-                style="
-                    border:none;
-                    padding:10px 15px;
-                    border-radius:7px;
-                    background:#333;
-                    color:#888;
-                    font-weight:bold;
-                    margin-right:8px;
-                    cursor:not-allowed;
-                "
-            >
-
-                <i class="fa-solid fa-circle-check"></i>
-
-                Compra confirmada
-
-            </button>
-        `;
-
-    }
-
-
-    /* =====================================================
-       BOTÓN PUNTOS
-    ===================================================== */
+    let botonCompra = "";
 
     let botonPuntos = "";
 
 
-    if (!confirmado) {
+    /*
+       CONFIRMAR COMPRA
+    */
 
-        botonPuntos = `
+    if (!confirmada) {
+
+        botonCompra = `
             <button
                 type="button"
-                disabled
-                style="
-                    border:none;
-                    padding:10px 15px;
-                    border-radius:7px;
-                    background:#252525;
-                    color:#666;
-                    font-weight:bold;
-                    cursor:not-allowed;
-                "
+                class="btn-principal"
+                onclick="confirmarCompraPedido('${escaparHTMLPedidos(id)}')"
             >
-
-                <i class="fa-solid fa-star"></i>
-
-                Dar puntos
-
+                <i class="fa-solid fa-check"></i>
+                Confirmar compra
             </button>
         `;
 
+    } else {
+
+        botonCompra = `
+            <button
+                type="button"
+                class="btn-principal"
+                disabled
+            >
+                <i class="fa-solid fa-check"></i>
+                Compra confirmada
+            </button>
+        `;
     }
 
-    else if (puntosValidados) {
+
+    /*
+       PUNTOS
+    */
+
+    if (!confirmada) {
 
         botonPuntos = `
             <button
                 type="button"
+                class="btn-secundario"
                 disabled
-                style="
-                    border:none;
-                    padding:10px 15px;
-                    border-radius:7px;
-                    background:#173a20;
-                    color:#8ee59c;
-                    font-weight:bold;
-                    cursor:not-allowed;
-                "
             >
-
                 <i class="fa-solid fa-star"></i>
+                Confirma la compra primero
+            </button>
+        `;
 
+    } else if (puntosValidados) {
+
+        botonPuntos = `
+            <button
+                type="button"
+                class="btn-secundario"
+                disabled
+            >
+                <i class="fa-solid fa-star"></i>
                 Puntos otorgados:
-                ${puntosGenerados}
-
+                ${Number(pedido?.puntos_generados) || puntos}
             </button>
         `;
 
-    }
+    } else if (puntos <= 0) {
 
-    else {
+        botonPuntos = `
+            <button
+                type="button"
+                class="btn-secundario"
+                disabled
+            >
+                <i class="fa-solid fa-star"></i>
+                Sin puntos
+            </button>
+        `;
 
-        const puntosCalculados =
-            calcularPuntosPedidoAdmin(
-                total
-            );
+    } else {
 
-
-        if (
-            puntosCalculados > 0
-        ) {
-
-            botonPuntos = `
-                <button
-                    type="button"
-                    onclick="darPuntosPedido('${escaparHTML(
-                pedido.id
-            )}')"
-                    style="
-                        border:none;
-                        cursor:pointer;
-                        padding:10px 15px;
-                        border-radius:7px;
-                        background:#d8b56a;
-                        color:#111;
-                        font-weight:bold;
-                    "
-                >
-
-                    <i class="fa-solid fa-star"></i>
-
-                    Dar ${puntosCalculados}
-                    ${puntosCalculados === 1
-                    ? "punto"
-                    : "puntos"
-                }
-
-                </button>
-            `;
-
-        }
-
-        else {
-
-            botonPuntos = `
-                <button
-                    type="button"
-                    disabled
-                    style="
-                        border:none;
-                        padding:10px 15px;
-                        border-radius:7px;
-                        background:#252525;
-                        color:#888;
-                        font-weight:bold;
-                        cursor:not-allowed;
-                    "
-                >
-
-                    <i class="fa-solid fa-star"></i>
-
-                    No genera puntos
-
-                </button>
-            `;
-
-        }
-
+        botonPuntos = `
+            <button
+                type="button"
+                class="btn-principal"
+                onclick="darPuntosPedido('${escaparHTMLPedidos(id)}')"
+            >
+                <i class="fa-solid fa-star"></i>
+                Dar ${puntos} puntos
+            </button>
+        `;
     }
 
 
-    /* =====================================================
-       TARJETA
-    ===================================================== */
+    return `
+        <div
+            class="producto-card"
+            data-pedido-id="${escaparHTMLPedidos(id)}"
+        >
 
-    tarjeta.innerHTML = `
+            <div class="producto-card-cabecera">
 
-        <div class="producto-info">
+                <div>
+                    <strong>
+                        Pedido #${escaparHTMLPedidos(id)}
+                    </strong>
 
-            <span class="mini-titulo">
+                    <span>
+                        ${fecha}
+                        ${hora ? ` · ${hora}` : ""}
+                    </span>
+                </div>
 
-                PEDIDO #${escaparHTML(
-        pedido.id
-    )}
+                <span class="badge-estado ${escaparHTMLPedidos(estado)}">
+                    ${escaparHTMLPedidos(estado)}
+                </span>
 
-            </span>
-
-
-            <h3 style="margin-top:8px;">
-
-                ${escaparHTML(
-        nombreCliente
-    )}
-
-            </h3>
+            </div>
 
 
-            ${correoCliente
+            <div class="producto-card-usuario">
+
+                <strong>
+                    ${escaparHTMLPedidos(nombre)}
+                </strong>
+
+                ${correo
             ? `
-                        <p style="
-                            color:#999;
-                            margin:5px 0;
-                        ">
-
-                            <i class="fa-solid fa-envelope"></i>
-
-                            ${escaparHTML(
-                correoCliente
-            )}
-
-                        </p>
-                    `
-            : ""
-        }
-
-
-            <p style="
-                color:#999;
-                margin:5px 0;
-            ">
-
-                <i class="fa-solid fa-calendar"></i>
-
-                ${formatearFechaPedido(
-            pedido.creado_en
-        )}
-
-                ${pedido.creado_en
-            ? `
-                            -
-                            ${formatearHoraPedido(
-                pedido.creado_en
-            )}
+                            <small>
+                                ${escaparHTMLPedidos(correo)}
+                            </small>
                         `
             : ""
         }
 
-            </p>
+            </div>
 
 
-            <div style="
-                margin-top:15px;
-                padding:12px;
-                background:#181818;
-                border-radius:8px;
-            ">
+            <div class="producto-card-descripcion">
 
-                <strong style="
-                    color:#d8b56a;
-                ">
-
-                    Productos
-
-                </strong>
-
-
-                <div style="
-                    margin-top:8px;
-                ">
-
-                    ${listaProductos}
-
-                </div>
+                ${productosHTML}
 
             </div>
 
 
-            <div style="
-                margin-top:15px;
-                display:flex;
-                gap:15px;
-                flex-wrap:wrap;
-                align-items:center;
-            ">
+            <div class="producto-card-pie">
 
                 <div>
-
-                    <span style="
-                        display:block;
-                        color:#888;
-                        font-size:12px;
-                    ">
-
-                        CANTIDAD
-
-                    </span>
-
                     <strong>
-
                         ${cantidad}
-
                     </strong>
 
+                    producto(s)
                 </div>
 
 
                 <div>
-
-                    <span style="
-                        display:block;
-                        color:#888;
-                        font-size:12px;
-                    ">
-
-                        TOTAL
-
-                    </span>
-
-                    <strong style="
-                        color:#d8b56a;
-                        font-size:18px;
-                    ">
-
-                        ${dineroPedido(
-            total
-        )}
-
+                    <strong>
+                        ${dineroPedido(total)}
                     </strong>
-
                 </div>
 
 
                 <div>
+                    <strong>
+                        ${puntos}
+                    </strong>
 
-                    ${estadoHTML}
-
+                    puntos disponibles
                 </div>
 
             </div>
 
 
-            <div style="
-                margin-top:18px;
-            ">
+            <div
+                class="modal-acciones"
+                style="margin-top:15px;"
+            >
 
-                ${botonConfirmar}
+                ${botonCompra}
 
                 ${botonPuntos}
 
@@ -1399,12 +850,6 @@ async function crearTarjetaPedidoAdmin(
 
         </div>
     `;
-
-
-    contenedor.appendChild(
-        tarjeta
-    );
-
 }
 
 
@@ -1412,605 +857,441 @@ async function crearTarjetaPedidoAdmin(
    CONFIRMAR COMPRA
 ========================================================= */
 
-window.confirmarCompraPedido =
-    async function (
-        pedidoId
-    ) {
+window.confirmarCompraPedido = async function (pedidoId) {
 
-        const confirmar =
-            window.confirm(
-                "¿Deseas confirmar esta compra?"
-            );
+    if (!pedidoId) {
+        return;
+    }
 
 
-        if (!confirmar) {
-
-            return;
-
-        }
-
-
-        try {
-
-            const {
-                data: pedido,
-                error: errorPedido
-            } =
-                await supabasePedidos
-                    .from("pedidos")
-                    .select("*")
-                    .eq(
-                        "id",
-                        pedidoId
-                    )
-                    .maybeSingle();
+    const confirmar =
+        window.confirm(
+            "¿Confirmar esta compra?"
+        );
 
 
-            if (errorPedido) {
-
-                console.error(
-                    "Error buscando pedido:",
-                    errorPedido
-                );
+    if (!confirmar) {
+        return;
+    }
 
 
-                alert(
-                    "No se pudo obtener el pedido.\n\n" +
-                    errorPedido.message
-                );
+    try {
 
-                return;
-
-            }
-
-
-            if (!pedido) {
-
-                alert(
-                    "El pedido no existe."
-                );
-
-                return;
-
-            }
+        const { data: pedido, error: errorPedido } =
+            await supabasePedidos
+                .from("pedidos")
+                .select("*")
+                .eq("id", pedidoId)
+                .maybeSingle();
 
 
-            if (
-                String(
-                    pedido.estado || ""
-                ).toLowerCase() ===
-                "confirmada"
-            ) {
-
-                alert(
-                    "Este pedido ya está confirmado."
-                );
-
-
-                await cargarPedidosAdministracion();
-
-                return;
-
-            }
-
-
-            const {
-                error
-            } =
-                await supabasePedidos
-                    .from("pedidos")
-                    .update({
-
-                        estado:
-                            "confirmada",
-
-                        confirmado_en:
-                            new Date().toISOString()
-
-                    })
-                    .eq(
-                        "id",
-                        pedidoId
-                    );
-
-
-            if (error) {
-
-                console.error(
-                    "Error confirmando pedido:",
-                    error
-                );
-
-
-                alert(
-                    "No se pudo confirmar el pedido.\n\n" +
-                    error.message
-                );
-
-                return;
-
-            }
-
-
-            alert(
-                "Compra confirmada correctamente."
-            );
-
-
-            await cargarPedidosAdministracion();
-
-
-            if (
-                typeof window.actualizarDashboard ===
-                "function"
-            ) {
-
-                await window.actualizarDashboard();
-
-            }
-
-        }
-
-        catch (error) {
+        if (errorPedido) {
 
             console.error(
-                "Error inesperado confirmando compra:",
+                errorPedido
+            );
+
+            alert(
+                "No se pudo obtener el pedido:\n" +
+                errorPedido.message
+            );
+
+            return;
+        }
+
+
+        if (!pedido) {
+
+            alert(
+                "No se encontró el pedido."
+            );
+
+            return;
+        }
+
+
+        const { error } =
+            await supabasePedidos
+                .from("pedidos")
+                .update({
+                    estado: "confirmada",
+                    confirmado_en:
+                        new Date().toISOString()
+                })
+                .eq("id", pedidoId);
+
+
+        if (error) {
+
+            console.error(
+                "Error confirmando compra:",
                 error
             );
 
-
             alert(
-                "Ocurrió un error al confirmar la compra."
+                "No se pudo confirmar la compra:\n" +
+                error.message
             );
 
+            return;
         }
 
-    };
+
+        alert(
+            "Compra confirmada correctamente."
+        );
+
+
+        await cargarPedidosAdministracion();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Ocurrió un error:\n" +
+            error.message
+        );
+    }
+};
 
 
 /* =========================================================
    DAR PUNTOS
 ========================================================= */
 
-window.darPuntosPedido =
-    async function (
-        pedidoId
-    ) {
+window.darPuntosPedido = async function (pedidoId) {
 
-        const confirmar =
-            window.confirm(
-                "¿Deseas otorgar los puntos de esta compra?"
-            );
+    if (!pedidoId) {
+        return;
+    }
 
 
-        if (!confirmar) {
+    const confirmar =
+        window.confirm(
+            "¿Deseas otorgar los puntos de este pedido?"
+        );
 
-            return;
 
-        }
+    if (!confirmar) {
+        return;
+    }
 
 
-        try {
+    try {
 
-            const {
-                data: pedido,
-                error: errorPedido
-            } =
-                await supabasePedidos
-                    .from("pedidos")
-                    .select("*")
-                    .eq(
-                        "id",
-                        pedidoId
-                    )
-                    .maybeSingle();
+        /*
+           OBTENER PEDIDO
+        */
 
+        const { data: pedido, error: errorPedido } =
+            await supabasePedidos
+                .from("pedidos")
+                .select("*")
+                .eq("id", pedidoId)
+                .maybeSingle();
 
-            if (errorPedido) {
 
-                console.error(
-                    "Error obteniendo pedido:",
-                    errorPedido
-                );
-
-
-                alert(
-                    "No se pudo obtener el pedido.\n\n" +
-                    errorPedido.message
-                );
-
-                return;
-
-            }
-
-
-            if (!pedido) {
-
-                alert(
-                    "El pedido no existe."
-                );
-
-                return;
-
-            }
-
-
-            if (
-                String(
-                    pedido.estado || ""
-                ).toLowerCase() !==
-                "confirmada"
-            ) {
-
-                alert(
-                    "Primero debes confirmar la compra."
-                );
-
-                return;
-
-            }
-
-
-            if (
-                pedido.puntos_validados === true
-            ) {
-
-                alert(
-                    "Los puntos de este pedido ya fueron otorgados."
-                );
-
-
-                await cargarPedidosAdministracion();
-
-                return;
-
-            }
-
-
-            /* =================================================
-               CALCULAR PUNTOS
-
-               Q149 = 0
-               Q150 = 5
-               Q300 = 10
-               Q450 = 15
-               Q600 = 20
-            ================================================= */
-
-            const total =
-                obtenerTotalPedidoAdmin(
-                    pedido
-                );
-
-
-            const puntos =
-                calcularPuntosPedidoAdmin(
-                    total
-                );
-
-
-            if (
-                puntos <= 0
-            ) {
-
-                alert(
-                    "Esta compra no genera puntos.\n\n" +
-                    "La compra mínima es de Q150.00."
-                );
-
-                return;
-
-            }
-
-
-            /* =================================================
-               OBTENER USUARIO
-            ================================================= */
-
-            const usuarioId =
-                obtenerUsuarioIdPedido(
-                    pedido
-                );
-
-
-            if (!usuarioId) {
-
-                alert(
-                    "No se encontró el usuario asociado a este pedido."
-                );
-
-
-                console.error(
-                    "Pedido sin usuario_id/user_id/cliente_id:",
-                    pedido
-                );
-
-                return;
-
-            }
-
-
-            /* =================================================
-               BUSCAR PERFIL
-            ================================================= */
-
-            const {
-                data: perfil,
-                error: errorPerfil
-            } =
-                await supabasePedidos
-                    .from("perfiles")
-                    .select(
-                        'id,"Puntos"'
-                    )
-                    .eq(
-                        "id",
-                        usuarioId
-                    )
-                    .maybeSingle();
-
-
-            if (errorPerfil) {
-
-                console.error(
-                    "Error buscando perfil:",
-                    errorPerfil
-                );
-
-
-                alert(
-                    "No se pudo obtener el perfil del cliente.\n\n" +
-                    errorPerfil.message
-                );
-
-                return;
-
-            }
-
-
-            if (!perfil) {
-
-                alert(
-                    "No existe un perfil para este usuario."
-                );
-
-                return;
-
-            }
-
-
-            const puntosActuales =
-                Number(
-                    perfil["Puntos"]
-                ) || 0;
-
-
-            const nuevosPuntos =
-                puntosActuales +
-                puntos;
-
-
-            /* =================================================
-               ACTUALIZAR PERFIL
-            ================================================= */
-
-            const {
-                error: errorActualizarPerfil
-            } =
-                await supabasePedidos
-                    .from("perfiles")
-                    .update({
-
-                        "Puntos":
-                            nuevosPuntos
-
-                    })
-                    .eq(
-                        "id",
-                        usuarioId
-                    );
-
-
-            if (
-                errorActualizarPerfil
-            ) {
-
-                console.error(
-                    "Error actualizando puntos:",
-                    errorActualizarPerfil
-                );
-
-
-                alert(
-                    "No se pudieron agregar los puntos.\n\n" +
-                    errorActualizarPerfil.message
-                );
-
-                return;
-
-            }
-
-
-            /* =================================================
-               MARCAR PEDIDO COMO VALIDADO
-            ================================================= */
-
-            const {
-                error: errorValidarPedido
-            } =
-                await supabasePedidos
-                    .from("pedidos")
-                    .update({
-
-                        puntos_generados:
-                            puntos,
-
-                        puntos_validados:
-                            true,
-
-                        puntos_validados_en:
-                            new Date().toISOString()
-
-                    })
-                    .eq(
-                        "id",
-                        pedidoId
-                    );
-
-
-            if (
-                errorValidarPedido
-            ) {
-
-                console.error(
-                    "Error validando puntos:",
-                    errorValidarPedido
-                );
-
-
-                alert(
-                    "Los puntos fueron agregados, pero no se pudo marcar el pedido como validado.\n\n" +
-                    errorValidarPedido.message
-                );
-
-                return;
-
-            }
-
-
-            alert(
-                "Puntos otorgados correctamente.\n\n" +
-                "Puntos agregados: " +
-                puntos +
-                "\n" +
-                "Puntos actuales: " +
-                nuevosPuntos
-            );
-
-
-            await cargarPedidosAdministracion();
-
-
-        }
-
-        catch (error) {
+        if (errorPedido) {
 
             console.error(
-                "Error inesperado dando puntos:",
-                error
+                "Error obteniendo pedido:",
+                errorPedido
             );
+
+            alert(
+                "No se pudo obtener el pedido:\n\n" +
+                errorPedido.message
+            );
+
+            return;
+        }
+
+
+        if (!pedido) {
+
+            alert(
+                "No se encontró el pedido."
+            );
+
+            return;
+        }
+
+
+        /*
+           VERIFICAR ESTADO
+        */
+
+        const estado =
+            String(pedido.estado || "")
+                .toLowerCase();
+
+
+        if (estado !== "confirmada") {
+
+            alert(
+                "Primero debes confirmar la compra."
+            );
+
+            return;
+        }
+
+
+        /*
+           EVITAR DUPLICADOS
+        */
+
+        if (pedido.puntos_validados === true) {
+
+            alert(
+                "Los puntos de este pedido ya fueron otorgados."
+            );
+
+            return;
+        }
+
+
+        /*
+           CALCULAR PUNTOS
+        */
+
+        const total =
+            obtenerTotalPedidoAdmin(pedido);
+
+
+        const puntos =
+            calcularPuntosPedidoAdmin(total);
+
+
+        if (puntos <= 0) {
+
+            alert(
+                "El pedido no tiene un total válido para generar puntos."
+            );
+
+            return;
+        }
+
+
+        /*
+           BUSCAR CLIENTE
+        */
+
+        const resultadoPerfil =
+            await buscarPerfilClientePedido(pedido);
+
+
+        const perfil =
+            resultadoPerfil?.perfil;
+
+
+        const usuarioId =
+            resultadoPerfil?.id;
+
+
+        if (!perfil || !usuarioId) {
+
+            const nombre =
+                obtenerNombreClientePedido(pedido);
+
+
+            const correo =
+                obtenerCorreoClientePedido(pedido);
 
 
             alert(
-                "Ocurrió un error al otorgar los puntos."
+                "No se encontró el perfil del cliente.\n\n" +
+                "Pedido: #" + pedidoId + "\n" +
+                "Cliente: " + nombre + "\n" +
+                "Correo: " + (correo || "Sin correo") +
+                "\n\n" +
+                "El pedido necesita tener un usuario asociado " +
+                "por ID o un correo que coincida con la tabla perfiles."
             );
 
+            return;
         }
 
-    };
+
+        /*
+           PUNTOS ACTUALES
+        */
+
+        const puntosActuales =
+            Number(perfil["Puntos"]) || 0;
+
+
+        const nuevosPuntos =
+            puntosActuales + puntos;
+
+
+        console.log(
+            "PUNTOS:",
+            {
+                pedidoId,
+                usuarioId,
+                puntosActuales,
+                puntosGenerados: puntos,
+                nuevosPuntos
+            }
+        );
+
+
+        /*
+           ACTUALIZAR PERFIL
+        */
+
+        const { error: errorPerfil } =
+            await supabasePedidos
+                .from("perfiles")
+                .update({
+                    "Puntos": nuevosPuntos
+                })
+                .eq("id", usuarioId);
+
+
+        if (errorPerfil) {
+
+            console.error(
+                "Error actualizando puntos:",
+                errorPerfil
+            );
+
+            alert(
+                "No se pudieron generar los puntos.\n\n" +
+                "Error de perfiles:\n" +
+                errorPerfil.message
+            );
+
+            return;
+        }
+
+
+        /*
+           MARCAR PEDIDO COMO VALIDADO
+        */
+
+        const { error: errorValidarPedido } =
+            await supabasePedidos
+                .from("pedidos")
+                .update({
+
+                    puntos_generados:
+                        puntos,
+
+                    puntos_validados:
+                        true,
+
+                    puntos_validados_en:
+                        new Date().toISOString()
+
+                })
+                .eq("id", pedidoId);
+
+
+        /*
+           SI FALLA EL PEDIDO,
+           INTENTAMOS DEVOLVER LOS PUNTOS
+        */
+
+        if (errorValidarPedido) {
+
+            console.error(
+                "Error validando pedido:",
+                errorValidarPedido
+            );
+
+
+            await supabasePedidos
+                .from("perfiles")
+                .update({
+                    "Puntos": puntosActuales
+                })
+                .eq("id", usuarioId);
+
+
+            alert(
+                "Los puntos no pudieron quedar registrados " +
+                "en el pedido.\n\n" +
+                "Los puntos fueron revertidos para evitar " +
+                "duplicarlos.\n\n" +
+                "Error:\n" +
+                errorValidarPedido.message
+            );
+
+            return;
+        }
+
+
+        /*
+           TODO CORRECTO
+        */
+
+        alert(
+            "¡Puntos generados correctamente!\n\n" +
+            "Cliente: " +
+            obtenerNombreClientePedido(pedido) +
+            "\n\n" +
+            "Puntos generados: " +
+            puntos +
+            "\n\n" +
+            "Puntos anteriores: " +
+            puntosActuales +
+            "\n" +
+            "Puntos nuevos: " +
+            nuevosPuntos
+        );
+
+
+        /*
+           RECARGAR PEDIDOS
+        */
+
+        await cargarPedidosAdministracion();
+
+
+    } catch (error) {
+
+        console.error(
+            "Error generando puntos:",
+            error
+        );
+
+        alert(
+            "Ocurrió un error al generar los puntos:\n\n" +
+            error.message
+        );
+    }
+};
 
 
 /* =========================================================
-   REFRESCAR PEDIDOS CUANDO CAMBIA EL AÑO
+   INICIALIZAR
 ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
-    function () {
-
-        /*
-           CARGA INICIAL
-        */
+    () => {
 
         cargarPedidosAdministracion();
 
 
-        /*
-           SELECTOR DE AÑO
-        */
-
         const selector =
-            document.getElementById(
-                "selectorAño"
-            );
+            document.getElementById("selectorAño");
 
 
-        if (!selector) {
+        if (selector) {
 
-            console.warn(
-                "No se encontró el selector #selectorAño"
-            );
+            selector.addEventListener(
+                "change",
+                () => {
 
-            return;
-
-        }
-
-
-        /*
-           CAMBIO DE AÑO
-        */
-
-        selector.addEventListener(
-            "change",
-            function () {
-
-                const año =
-                    Number(
-                        selector.value
-                    );
-
-
-                if (
-                    !Number.isFinite(año) ||
-                    año < 1900
-                ) {
-
-                    return;
+                    cargarPedidosAdministracion();
 
                 }
-
-
-                /*
-                   GUARDAR AÑO
-                */
-
-                localStorage.setItem(
-                    "dlLuxuryAñoSeleccionado",
-                    String(año)
-                );
-
-
-                console.log(
-                    "Cambiando pedidos al año:",
-                    año
-                );
-
-
-                /*
-                   RECARGAR PEDIDOS
-                */
-
-                cargarPedidosAdministracion();
-
-            }
-        );
-
-
-        /*
-           SI EL SELECTOR CAMBIA
-           DESPUÉS DE QUE ESTE SCRIPT
-           YA SE EJECUTÓ, TAMBIÉN
-           PODREMOS RECARGAR.
-        */
-
-        window.addEventListener(
-            "dlLuxuryAñoCambiado",
-            function () {
-
-                cargarPedidosAdministracion();
-
-            }
-        );
+            );
+        }
 
     }
 );
@@ -2023,26 +1304,11 @@ document.addEventListener(
 window.cargarPedidosAdministracion =
     cargarPedidosAdministracion;
 
-
-window.obtenerProductosPedidoAdmin =
-    obtenerProductosPedidoAdmin;
-
-
-window.obtenerCantidadPedidoAdmin =
-    obtenerCantidadPedidoAdmin;
-
+window.calcularPuntosPedidoAdmin =
+    calcularPuntosPedidoAdmin;
 
 window.obtenerTotalPedidoAdmin =
     obtenerTotalPedidoAdmin;
 
-
-window.obtenerUsuarioIdPedido =
-    obtenerUsuarioIdPedido;
-
-
-window.obtenerAñoSeleccionadoPedidos =
-    obtenerAñoSeleccionadoPedidos;
-
-
-window.calcularPuntosPedidoAdmin =
-    calcularPuntosPedidoAdmin;
+window.obtenerProductosPedidoAdmin =
+    obtenerProductosPedidoAdmin;
