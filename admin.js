@@ -32,9 +32,22 @@
    Math.floor(total / 10)
 
    SIN LÍMITE
+
+   IMPORTANTE:
+
+   Los puntos NO se guardan en perfiles.
+
+   Los puntos se guardan en:
+
+   pedidos.puntos_generados
+   pedidos.puntos_validados
+   pedidos.puntos_validados_en
+
 ========================================================= */
 
+
 document.addEventListener("DOMContentLoaded", function () {
+
 
     /* =====================================================
        SUPABASE
@@ -57,9 +70,14 @@ document.addEventListener("DOMContentLoaded", function () {
        CONFIGURACIÓN
     ===================================================== */
 
-    const ANO_KEY = "dlLuxuryAñoSeleccionado";
-    const VENTAS_KEY = "dlLuxuryVentas";
-    const EGRESOS_KEY = "dlLuxuryEgresos";
+    const ANO_KEY =
+        "dlLuxuryAñoSeleccionado";
+
+    const VENTAS_KEY =
+        "dlLuxuryVentas";
+
+    const EGRESOS_KEY =
+        "dlLuxuryEgresos";
 
 
     /* =====================================================
@@ -68,7 +86,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function dinero(numero) {
 
-        const valor = Number(numero);
+        const valor =
+            Number(numero);
 
         return "Q" +
             (
@@ -92,11 +111,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function formatearFecha(fecha) {
 
-        if (!fecha) return "";
+        if (!fecha) {
+            return "";
+        }
 
-        const fechaObj = new Date(fecha);
+        const fechaObj =
+            new Date(fecha);
 
-        if (Number.isNaN(fechaObj.getTime())) {
+        if (
+            Number.isNaN(
+                fechaObj.getTime()
+            )
+        ) {
             return "";
         }
 
@@ -113,11 +139,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function formatearHora(fecha) {
 
-        if (!fecha) return "";
+        if (!fecha) {
+            return "";
+        }
 
-        const fechaObj = new Date(fecha);
+        const fechaObj =
+            new Date(fecha);
 
-        if (Number.isNaN(fechaObj.getTime())) {
+        if (
+            Number.isNaN(
+                fechaObj.getTime()
+            )
+        ) {
             return "";
         }
 
@@ -137,9 +170,14 @@ document.addEventListener("DOMContentLoaded", function () {
             return new Date().getFullYear();
         }
 
-        const fechaObj = new Date(fecha);
+        const fechaObj =
+            new Date(fecha);
 
-        if (Number.isNaN(fechaObj.getTime())) {
+        if (
+            Number.isNaN(
+                fechaObj.getTime()
+            )
+        ) {
             return new Date().getFullYear();
         }
 
@@ -164,7 +202,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function calcularPuntos(total) {
 
-        const monto = Number(total) || 0;
+        const monto =
+            Number(total) || 0;
 
         if (
             !Number.isFinite(monto) ||
@@ -173,7 +212,9 @@ document.addEventListener("DOMContentLoaded", function () {
             return 0;
         }
 
-        return Math.floor(monto / 10);
+        return Math.floor(
+            monto / 10
+        );
     }
 
 
@@ -188,7 +229,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const datos =
                 localStorage.getItem(clave);
 
-            if (!datos) return [];
+            if (!datos) {
+                return [];
+            }
 
             const resultado =
                 JSON.parse(datos);
@@ -210,7 +253,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    function guardarDatos(clave, datos) {
+    function guardarDatos(
+        clave,
+        datos
+    ) {
 
         try {
 
@@ -239,22 +285,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     function obtenerVentas() {
-        return leerDatos(VENTAS_KEY);
+
+        return leerDatos(
+            VENTAS_KEY
+        );
     }
 
 
-    function guardarVentas(ventas) {
-        return guardarDatos(VENTAS_KEY, ventas);
+    function guardarVentas(
+        ventas
+    ) {
+
+        return guardarDatos(
+            VENTAS_KEY,
+            ventas
+        );
     }
 
 
     function obtenerEgresos() {
-        return leerDatos(EGRESOS_KEY);
+
+        return leerDatos(
+            EGRESOS_KEY
+        );
     }
 
 
-    function guardarEgresos(egresos) {
-        return guardarDatos(EGRESOS_KEY, egresos);
+    function guardarEgresos(
+        egresos
+    ) {
+
+        return guardarDatos(
+            EGRESOS_KEY,
+            egresos
+        );
     }
 
 
@@ -269,16 +333,20 @@ document.addEventListener("DOMContentLoaded", function () {
             const {
                 data,
                 error
-            } = await supabaseClient
-                .from("pedidos")
-                .select("*")
-                .eq("estado", "confirmada")
-                .order(
-                    "creado_en",
-                    {
-                        ascending: false
-                    }
-                );
+            } =
+                await supabaseClient
+                    .from("pedidos")
+                    .select("*")
+                    .eq(
+                        "estado",
+                        "confirmada"
+                    )
+                    .order(
+                        "creado_en",
+                        {
+                            ascending: false
+                        }
+                    );
 
             if (error) {
 
@@ -311,15 +379,16 @@ document.addEventListener("DOMContentLoaded", function () {
             const {
                 data,
                 error
-            } = await supabaseClient
-                .from("pedidos")
-                .select("*")
-                .order(
-                    "creado_en",
-                    {
-                        ascending: false
-                    }
-                );
+            } =
+                await supabaseClient
+                    .from("pedidos")
+                    .select("*")
+                    .order(
+                        "creado_en",
+                        {
+                            ascending: false
+                        }
+                    );
 
             if (error) {
 
@@ -358,26 +427,37 @@ document.addEventListener("DOMContentLoaded", function () {
        PRODUCTOS DEL PEDIDO
     ===================================================== */
 
-    function obtenerProductosPedido(pedido) {
+    function obtenerProductosPedido(
+        pedido
+    ) {
 
         let productos = [];
 
         try {
 
-            if (Array.isArray(pedido?.productos)) {
-
-                productos = pedido.productos;
-
-            } else if (
-                typeof pedido?.productos === "string"
+            if (
+                Array.isArray(
+                    pedido?.productos
+                )
             ) {
 
                 productos =
-                    JSON.parse(pedido.productos);
+                    pedido.productos;
+
+            } else if (
+                typeof pedido?.productos ===
+                "string"
+            ) {
+
+                productos =
+                    JSON.parse(
+                        pedido.productos
+                    );
 
             } else if (
                 pedido?.productos &&
-                typeof pedido.productos === "object"
+                typeof pedido.productos ===
+                "object"
             ) {
 
                 productos = [
@@ -401,7 +481,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    function obtenerIdProductoPedido(producto) {
+    function obtenerIdProductoPedido(
+        producto
+    ) {
 
         return (
             producto?.producto_id ??
@@ -413,7 +495,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    function obtenerNombreProductoPedido(producto) {
+    function obtenerNombreProductoPedido(
+        producto
+    ) {
 
         return (
             producto?.nombre ||
@@ -425,7 +509,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    function obtenerCantidadProducto(producto) {
+    function obtenerCantidadProducto(
+        producto
+    ) {
 
         const cantidad =
             Number(
@@ -442,58 +528,80 @@ document.addEventListener("DOMContentLoaded", function () {
             return 1;
         }
 
-        return Math.floor(cantidad);
+        return Math.floor(
+            cantidad
+        );
     }
 
 
-    function obtenerCantidadProductosPedido(pedido) {
+    function obtenerCantidadProductosPedido(
+        pedido
+    ) {
 
         const productos =
-            obtenerProductosPedido(pedido);
+            obtenerProductosPedido(
+                pedido
+            );
 
         let cantidadTotal = 0;
 
-        productos.forEach(function (producto) {
+        productos.forEach(
+            function (producto) {
 
-            cantidadTotal +=
-                obtenerCantidadProducto(producto);
-
-        });
+                cantidadTotal +=
+                    obtenerCantidadProducto(
+                        producto
+                    );
+            }
+        );
 
         return cantidadTotal;
     }
 
 
-    function obtenerTotalPedido(pedido) {
+    function obtenerTotalPedido(
+        pedido
+    ) {
 
         const total =
-            Number(pedido?.total);
+            Number(
+                pedido?.total
+            );
 
-        if (Number.isFinite(total)) {
+        if (
+            Number.isFinite(total)
+        ) {
             return total;
         }
 
         const productos =
-            obtenerProductosPedido(pedido);
+            obtenerProductosPedido(
+                pedido
+            );
 
         let totalCalculado = 0;
 
-        productos.forEach(function (producto) {
+        productos.forEach(
+            function (producto) {
 
-            const precio =
-                Number(
-                    producto?.precio ??
-                    producto?.price ??
-                    producto?.precio_final ??
-                    0
-                );
+                const precio =
+                    Number(
+                        producto?.precio ??
+                        producto?.price ??
+                        producto?.precio_final ??
+                        0
+                    );
 
-            const cantidad =
-                obtenerCantidadProducto(producto);
+                const cantidad =
+                    obtenerCantidadProducto(
+                        producto
+                    );
 
-            totalCalculado +=
-                precio * cantidad;
-        });
+                totalCalculado +=
+                    precio *
+                    cantidad;
+            }
+        );
 
         return totalCalculado;
     }
@@ -504,17 +612,32 @@ document.addEventListener("DOMContentLoaded", function () {
     ===================================================== */
 
     window.mostrarSeccion =
-        function (id, boton = null) {
+        function (
+            id,
+            boton = null
+        ) {
 
             const paginas = {
 
-                gorras: "gorras.html",
-                playeras: "playeras.html",
-                hoodies: "hoodies.html",
-                perfumes: "perfumes.html",
-                accesorios: "accesorios.html",
-                descuentos: "descuentos.html"
+                gorras:
+                    "gorras.html",
+
+                playeras:
+                    "playeras.html",
+
+                hoodies:
+                    "hoodies.html",
+
+                perfumes:
+                    "perfumes.html",
+
+                accesorios:
+                    "accesorios.html",
+
+                descuentos:
+                    "descuentos.html"
             };
+
 
             if (paginas[id]) {
 
@@ -524,18 +647,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
+
             document
-                .querySelectorAll(".seccion")
-                .forEach(function (seccion) {
+                .querySelectorAll(
+                    ".seccion"
+                )
+                .forEach(
+                    function (seccion) {
 
-                    seccion.classList.remove(
-                        "activa"
-                    );
+                        seccion.classList.remove(
+                            "activa"
+                        );
+                    }
+                );
 
-                });
 
             const seccion =
-                document.getElementById(id);
+                document.getElementById(
+                    id
+                );
+
 
             if (seccion) {
 
@@ -544,41 +675,73 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
+
             document
-                .querySelectorAll(".menu")
-                .forEach(function (menu) {
+                .querySelectorAll(
+                    ".menu"
+                )
+                .forEach(
+                    function (menu) {
 
-                    menu.classList.remove(
-                        "active"
-                    );
+                        menu.classList.remove(
+                            "active"
+                        );
+                    }
+                );
 
-                });
 
             if (boton) {
-                boton.classList.add("active");
+
+                boton.classList.add(
+                    "active"
+                );
             }
 
-            if (id === "inicio") {
+
+            if (
+                id === "inicio"
+            ) {
+
                 actualizarDashboard();
             }
 
-            if (id === "ingresos") {
+
+            if (
+                id === "ingresos"
+            ) {
+
                 cargarIngresos();
             }
 
-            if (id === "ventas") {
+
+            if (
+                id === "ventas"
+            ) {
+
                 actualizarDashboard();
             }
 
-            if (id === "egresos") {
+
+            if (
+                id === "egresos"
+            ) {
+
                 mostrarEgresos();
             }
 
-            if (id === "stock") {
+
+            if (
+                id === "stock"
+            ) {
+
                 cargarStock();
             }
 
-            if (id === "pedidos") {
+
+            if (
+                id === "pedidos"
+            ) {
+
                 cargarPedidos();
             }
         };
@@ -601,14 +764,20 @@ document.addEventListener("DOMContentLoaded", function () {
                     "formEgreso"
                 );
 
-            if (!modal) return;
+            if (!modal) {
+                return;
+            }
 
             if (formulario) {
                 formulario.reset();
             }
 
-            modal.style.display = "flex";
-            modal.classList.add("activo");
+            modal.style.display =
+                "flex";
+
+            modal.classList.add(
+                "activo"
+            );
         };
 
 
@@ -620,10 +789,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     "modalEgreso"
                 );
 
-            if (!modal) return;
+            if (!modal) {
+                return;
+            }
 
-            modal.style.display = "none";
-            modal.classList.remove("activo");
+            modal.style.display =
+                "none";
+
+            modal.classList.remove(
+                "activo"
+            );
         };
 
 
@@ -636,6 +811,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "formEgreso"
         );
 
+
     if (formularioEgreso) {
 
         formularioEgreso.addEventListener(
@@ -644,25 +820,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 evento.preventDefault();
 
+
                 const descripcionInput =
                     document.getElementById(
                         "descripcionEgreso"
                     );
+
 
                 const montoInput =
                     document.getElementById(
                         "montoEgreso"
                     );
 
+
                 const descripcion =
                     descripcionInput
                         ? descripcionInput.value.trim()
                         : "";
 
+
                 const monto =
                     montoInput
-                        ? Number(montoInput.value)
+                        ? Number(
+                            montoInput.value
+                        )
                         : 0;
+
 
                 if (!descripcion) {
 
@@ -672,6 +855,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     return;
                 }
+
 
                 if (
                     !Number.isFinite(monto) ||
@@ -685,8 +869,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
+
                 const egresos =
                     obtenerEgresos();
+
 
                 egresos.push({
 
@@ -702,23 +888,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 });
 
+
                 if (
                     !guardarEgresos(
                         egresos
                     )
                 ) {
+
                     return;
                 }
+
 
                 alert(
                     "Egreso guardado correctamente."
                 );
 
+
                 window.cerrarModalEgreso();
 
                 mostrarEgresos();
+
                 cargarIngresos();
+
                 actualizarDashboard();
+
                 llenarSelectorAnios();
             }
         );
@@ -736,25 +929,38 @@ document.addEventListener("DOMContentLoaded", function () {
                 "listaEgresos"
             );
 
-        if (!contenedor) return;
+
+        if (!contenedor) {
+            return;
+        }
+
 
         const añoSeleccionado =
             obtenerAnoSeleccionado();
 
+
         const egresos =
             obtenerEgresos()
-                .filter(function (egreso) {
+                .filter(
+                    function (egreso) {
 
-                    return (
-                        obtenerAno(egreso.fecha) ===
-                        añoSeleccionado
-                    );
+                        return (
+                            obtenerAno(
+                                egreso.fecha
+                            ) ===
+                            añoSeleccionado
+                        );
+                    }
+                );
 
-                });
 
-        contenedor.innerHTML = "";
+        contenedor.innerHTML =
+            "";
 
-        if (egresos.length === 0) {
+
+        if (
+            egresos.length === 0
+        ) {
 
             contenedor.innerHTML = `
                 <div class="sin-productos">
@@ -772,41 +978,55 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+
         egresos
             .slice()
             .reverse()
-            .forEach(function (egreso) {
+            .forEach(
+                function (egreso) {
 
-                const tarjeta =
-                    document.createElement("div");
+                    const tarjeta =
+                        document.createElement(
+                            "div"
+                        );
 
-                tarjeta.className =
-                    "producto-card";
 
-                tarjeta.innerHTML = `
-                    <div class="producto-info">
+                    tarjeta.className =
+                        "producto-card";
 
-                        <span class="mini-titulo">
-                            ${formatearFecha(egreso.fecha)}
-                        </span>
 
-                        <h3>
-                            ${escaparHTML(
-                                egreso.descripcion
-                            )}
-                        </h3>
+                    tarjeta.innerHTML = `
+                        <div class="producto-info">
 
-                        <div class="producto-precio">
-                            <strong>
-                                ${dinero(egreso.monto)}
-                            </strong>
+                            <span class="mini-titulo">
+                                ${formatearFecha(
+                                    egreso.fecha
+                                )}
+                            </span>
+
+                            <h3>
+                                ${escaparHTML(
+                                    egreso.descripcion
+                                )}
+                            </h3>
+
+                            <div class="producto-precio">
+                                <strong>
+                                    ${dinero(
+                                        egreso.monto
+                                    )}
+                                </strong>
+                            </div>
+
                         </div>
+                    `;
 
-                    </div>
-                `;
 
-                contenedor.appendChild(tarjeta);
-            });
+                    contenedor.appendChild(
+                        tarjeta
+                    );
+                }
+            );
     }
 
 
@@ -821,20 +1041,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 "listaStock"
             );
 
+
         const totalProductosElemento =
             document.getElementById(
                 "totalProductos"
             );
+
 
         const stockTotalElemento =
             document.getElementById(
                 "stockTotal"
             );
 
+
         const stockBajoElemento =
             document.getElementById(
                 "stockBajo"
             );
+
 
         if (
             !tabla &&
@@ -842,19 +1066,23 @@ document.addEventListener("DOMContentLoaded", function () {
             !stockTotalElemento &&
             !stockBajoElemento
         ) {
+
             return;
         }
+
 
         try {
 
             const {
                 data,
                 error
-            } = await supabaseClient
-                .from("productos")
-                .select(
-                    "id,nombre,precio,stock,categoria_id,activo"
-                );
+            } =
+                await supabaseClient
+                    .from("productos")
+                    .select(
+                        "id,nombre,precio,stock,categoria_id,activo"
+                    );
+
 
             if (error) {
 
@@ -862,6 +1090,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "❌ Error cargando stock:",
                     error
                 );
+
 
                 if (tabla) {
 
@@ -881,51 +1110,86 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
+
             const productos =
                 (data || [])
-                    .filter(function (producto) {
+                    .filter(
+                        function (producto) {
 
-                        return (
-                            producto.activo !== false
-                        );
+                            return (
+                                producto.activo !== false
+                            );
+                        }
+                    );
 
-                    });
 
             let stockTotal = 0;
+
             let stockBajo = 0;
 
-            productos.forEach(function (producto) {
 
-                const stock =
-                    Number(producto.stock || 0);
+            productos.forEach(
+                function (producto) {
 
-                stockTotal += stock;
+                    const stock =
+                        Number(
+                            producto.stock || 0
+                        );
 
-                if (stock <= 5) {
-                    stockBajo++;
+
+                    stockTotal +=
+                        stock;
+
+
+                    if (
+                        stock <= 5
+                    ) {
+
+                        stockBajo++;
+                    }
                 }
-            });
+            );
 
-            if (totalProductosElemento) {
+
+            if (
+                totalProductosElemento
+            ) {
+
                 totalProductosElemento.textContent =
                     productos.length;
             }
 
-            if (stockTotalElemento) {
+
+            if (
+                stockTotalElemento
+            ) {
+
                 stockTotalElemento.textContent =
                     stockTotal;
             }
 
-            if (stockBajoElemento) {
+
+            if (
+                stockBajoElemento
+            ) {
+
                 stockBajoElemento.textContent =
                     stockBajo;
             }
 
-            if (!tabla) return;
 
-            tabla.innerHTML = "";
+            if (!tabla) {
+                return;
+            }
 
-            if (productos.length === 0) {
+
+            tabla.innerHTML =
+                "";
+
+
+            if (
+                productos.length === 0
+            ) {
 
                 tabla.innerHTML = `
                     <tr>
@@ -938,50 +1202,76 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            productos.forEach(function (producto) {
 
-                const stock =
-                    Number(producto.stock || 0);
+            productos.forEach(
+                function (producto) {
 
-                let estado = "Disponible";
+                    const stock =
+                        Number(
+                            producto.stock || 0
+                        );
 
-                if (stock <= 0) {
-                    estado = "Agotado";
-                } else if (stock <= 5) {
-                    estado = "Stock bajo";
+
+                    let estado =
+                        "Disponible";
+
+
+                    if (
+                        stock <= 0
+                    ) {
+
+                        estado =
+                            "Agotado";
+
+                    } else if (
+                        stock <= 5
+                    ) {
+
+                        estado =
+                            "Stock bajo";
+                    }
+
+
+                    const fila =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    fila.innerHTML = `
+                        <td>
+                            ${escaparHTML(
+                                producto.nombre
+                            )}
+                        </td>
+
+                        <td>
+                            ${obtenerNombreCategoria(
+                                producto.categoria_id
+                            )}
+                        </td>
+
+                        <td>
+                            ${dinero(
+                                producto.precio
+                            )}
+                        </td>
+
+                        <td>
+                            ${stock}
+                        </td>
+
+                        <td>
+                            ${estado}
+                        </td>
+                    `;
+
+
+                    tabla.appendChild(
+                        fila
+                    );
                 }
-
-                const fila =
-                    document.createElement("tr");
-
-                fila.innerHTML = `
-                    <td>
-                        ${escaparHTML(
-                            producto.nombre
-                        )}
-                    </td>
-
-                    <td>
-                        ${obtenerNombreCategoria(
-                            producto.categoria_id
-                        )}
-                    </td>
-
-                    <td>
-                        ${dinero(producto.precio)}
-                    </td>
-
-                    <td>
-                        ${stock}
-                    </td>
-
-                    <td>
-                        ${estado}
-                    </td>
-                `;
-
-                tabla.appendChild(fila);
-            });
+            );
 
         } catch (error) {
 
@@ -989,6 +1279,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "❌ Error inesperado cargando stock:",
                 error
             );
+
 
             if (tabla) {
 
@@ -1004,7 +1295,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    function obtenerNombreCategoria(categoriaId) {
+    function obtenerNombreCategoria(
+        categoriaId
+    ) {
 
         const categorias = {
 
@@ -1015,6 +1308,7 @@ document.addEventListener("DOMContentLoaded", function () {
             6: "Accesorios"
 
         };
+
 
         return escaparHTML(
             categorias[categoriaId] ||
@@ -1034,21 +1328,27 @@ document.addEventListener("DOMContentLoaded", function () {
                 "selectorAño"
             );
 
+
         if (
             selector &&
             selector.value
         ) {
 
             const ano =
-                Number(selector.value);
+                Number(
+                    selector.value
+                );
+
 
             if (
                 Number.isInteger(ano) &&
                 ano >= 1900
             ) {
+
                 return ano;
             }
         }
+
 
         const guardado =
             Number(
@@ -1057,14 +1357,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 )
             );
 
+
         if (
             Number.isInteger(guardado) &&
             guardado >= 1900
         ) {
+
             return guardado;
         }
 
-        return new Date().getFullYear();
+
+        return new Date()
+            .getFullYear();
     }
 
 
@@ -1079,25 +1383,37 @@ document.addEventListener("DOMContentLoaded", function () {
                 "tablaVentas"
             );
 
-        if (!tabla) return;
+
+        if (!tabla) {
+            return;
+        }
+
 
         const añoSeleccionado =
             obtenerAnoSeleccionado();
 
+
         const pedidos =
             await obtenerPedidosConfirmados();
 
+
         const pedidosAño =
-            pedidos.filter(function (pedido) {
+            pedidos.filter(
+                function (pedido) {
 
-                return (
-                    obtenerAno(pedido.creado_en) ===
-                    añoSeleccionado
-                );
+                    return (
+                        obtenerAno(
+                            pedido.creado_en
+                        ) ===
+                        añoSeleccionado
+                    );
+                }
+            );
 
-            });
 
-        cargarTablaVentasAno(pedidosAño);
+        cargarTablaVentasAno(
+            pedidosAño
+        );
     }
 
 
@@ -1110,96 +1426,144 @@ document.addEventListener("DOMContentLoaded", function () {
         const añoSeleccionado =
             obtenerAnoSeleccionado();
 
+
         const pedidos =
             await obtenerPedidosConfirmados();
 
+
         const pedidosAño =
-            pedidos.filter(function (pedido) {
+            pedidos.filter(
+                function (pedido) {
 
-                return (
-                    obtenerAno(pedido.creado_en) ===
-                    añoSeleccionado
-                );
+                    return (
+                        obtenerAno(
+                            pedido.creado_en
+                        ) ===
+                        añoSeleccionado
+                    );
+                }
+            );
 
-            });
 
         let totalIngresos = 0;
+
         let cantidadIngresos = 0;
 
-        pedidosAño.forEach(function (pedido) {
 
-            totalIngresos +=
-                Number(pedido.total || 0);
+        pedidosAño.forEach(
+            function (pedido) {
 
-            cantidadIngresos++;
-        });
+                totalIngresos +=
+                    Number(
+                        pedido.total || 0
+                    );
+
+                cantidadIngresos++;
+            }
+        );
+
 
         const egresos =
             obtenerEgresos()
-                .filter(function (egreso) {
+                .filter(
+                    function (egreso) {
 
-                    return (
-                        obtenerAno(egreso.fecha) ===
-                        añoSeleccionado
-                    );
+                        return (
+                            obtenerAno(
+                                egreso.fecha
+                            ) ===
+                            añoSeleccionado
+                        );
+                    }
+                );
 
-                });
 
         let totalEgresos = 0;
 
-        egresos.forEach(function (egreso) {
 
-            totalEgresos +=
-                Number(egreso.monto || 0);
-        });
+        egresos.forEach(
+            function (egreso) {
+
+                totalEgresos +=
+                    Number(
+                        egreso.monto || 0
+                    );
+            }
+        );
+
 
         const ganancia =
             totalIngresos -
             totalEgresos;
+
 
         const elementoIngresos =
             document.getElementById(
                 "totalIngresos"
             );
 
+
         const cantidadElemento =
             document.getElementById(
                 "cantidadIngresos"
             );
+
 
         const gananciaElemento =
             document.getElementById(
                 "gananciaIngresos"
             );
 
-        if (elementoIngresos) {
+
+        if (
+            elementoIngresos
+        ) {
 
             elementoIngresos.textContent =
-                dinero(totalIngresos);
+                dinero(
+                    totalIngresos
+                );
         }
 
-        if (cantidadElemento) {
+
+        if (
+            cantidadElemento
+        ) {
 
             cantidadElemento.textContent =
                 cantidadIngresos;
         }
 
-        if (gananciaElemento) {
+
+        if (
+            gananciaElemento
+        ) {
 
             gananciaElemento.textContent =
-                dinero(ganancia);
+                dinero(
+                    ganancia
+                );
         }
+
 
         const tabla =
             document.getElementById(
                 "tablaIngresos"
             );
 
-        if (!tabla) return;
 
-        tabla.innerHTML = "";
+        if (!tabla) {
+            return;
+        }
 
-        if (pedidosAño.length === 0) {
+
+        tabla.innerHTML =
+            "";
+
+
+        if (
+            pedidosAño.length === 0
+        ) {
 
             tabla.innerHTML = `
                 <tr>
@@ -1213,54 +1577,74 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        pedidosAño.forEach(function (pedido) {
 
-            const productos =
-                obtenerProductosPedido(pedido);
+        pedidosAño.forEach(
+            function (pedido) {
 
-            let nombreProducto =
-                "Pedido #" + pedido.id;
+                const productos =
+                    obtenerProductosPedido(
+                        pedido
+                    );
 
-            const cantidad =
-                obtenerCantidadProductosPedido(
-                    pedido
+
+                let nombreProducto =
+                    "Pedido #" +
+                    pedido.id;
+
+
+                const cantidad =
+                    obtenerCantidadProductosPedido(
+                        pedido
+                    );
+
+
+                if (
+                    productos.length === 1
+                ) {
+
+                    nombreProducto =
+                        productos[0]?.nombre ||
+                        productos[0]?.name ||
+                        nombreProducto;
+                }
+
+
+                const fila =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                fila.innerHTML = `
+                    <td>
+                        ${formatearFecha(
+                            pedido.creado_en
+                        )}
+                    </td>
+
+                    <td>
+                        ${escaparHTML(
+                            nombreProducto
+                        )}
+                    </td>
+
+                    <td>
+                        ${cantidad}
+                    </td>
+
+                    <td>
+                        ${dinero(
+                            pedido.total
+                        )}
+                    </td>
+                `;
+
+
+                tabla.appendChild(
+                    fila
                 );
-
-            if (productos.length === 1) {
-
-                nombreProducto =
-                    productos[0]?.nombre ||
-                    productos[0]?.name ||
-                    nombreProducto;
             }
-
-            const fila =
-                document.createElement("tr");
-
-            fila.innerHTML = `
-                <td>
-                    ${formatearFecha(
-                        pedido.creado_en
-                    )}
-                </td>
-
-                <td>
-                    ${escaparHTML(
-                        nombreProducto
-                    )}
-                </td>
-
-                <td>
-                    ${cantidad}
-                </td>
-
-                <td>
-                    ${dinero(pedido.total)}
-                </td>
-            `;
-
-            tabla.appendChild(fila);
-        });
+        );
     }
 
 
@@ -1273,133 +1657,198 @@ document.addEventListener("DOMContentLoaded", function () {
         const anoActual =
             obtenerAnoSeleccionado();
 
+
         const selector =
             document.getElementById(
                 "selectorAño"
             );
 
+
         if (selector) {
+
             selector.value =
-                String(anoActual);
+                String(
+                    anoActual
+                );
         }
+
 
         const anoTexto =
             document.getElementById(
                 "añoActual"
             );
 
+
         if (anoTexto) {
+
             anoTexto.textContent =
                 anoActual;
         }
 
+
         const pedidos =
             await obtenerPedidosConfirmados();
 
+
         const pedidosAño =
-            pedidos.filter(function (pedido) {
+            pedidos.filter(
+                function (pedido) {
 
-                return (
-                    obtenerAno(pedido.creado_en) ===
-                    anoActual
-                );
+                    return (
+                        obtenerAno(
+                            pedido.creado_en
+                        ) ===
+                        anoActual
+                    );
+                }
+            );
 
-            });
 
         const egresos =
             obtenerEgresos()
-                .filter(function (egreso) {
+                .filter(
+                    function (egreso) {
 
-                    return (
-                        obtenerAno(egreso.fecha) ===
-                        anoActual
-                    );
+                        return (
+                            obtenerAno(
+                                egreso.fecha
+                            ) ===
+                            anoActual
+                        );
+                    }
+                );
 
-                });
 
         let totalVentas = 0;
+
         let totalEgresos = 0;
+
         let productosVendidos = 0;
 
-        pedidosAño.forEach(function (pedido) {
 
-            totalVentas +=
-                Number(pedido.total || 0);
+        pedidosAño.forEach(
+            function (pedido) {
 
-            productosVendidos +=
-                obtenerCantidadProductosPedido(
-                    pedido
-                );
-        });
+                totalVentas +=
+                    Number(
+                        pedido.total || 0
+                    );
 
-        egresos.forEach(function (egreso) {
 
-            totalEgresos +=
-                Number(egreso.monto || 0);
-        });
+                productosVendidos +=
+                    obtenerCantidadProductosPedido(
+                        pedido
+                    );
+            }
+        );
+
+
+        egresos.forEach(
+            function (egreso) {
+
+                totalEgresos +=
+                    Number(
+                        egreso.monto || 0
+                    );
+            }
+        );
+
 
         const ganancia =
             totalVentas -
             totalEgresos;
+
 
         const elementoVentas =
             document.getElementById(
                 "totalVentas"
             );
 
+
         const elementoIngresos =
             document.getElementById(
                 "totalIngresos"
             );
+
 
         const elementoEgresos =
             document.getElementById(
                 "totalEgresos"
             );
 
+
         const elementoGanancia =
             document.getElementById(
                 "gananciaTotal"
             );
+
 
         const elementoProductos =
             document.getElementById(
                 "productosVendidos"
             );
 
-        if (elementoVentas) {
+
+        if (
+            elementoVentas
+        ) {
 
             elementoVentas.textContent =
-                dinero(totalVentas);
+                dinero(
+                    totalVentas
+                );
         }
 
-        if (elementoIngresos) {
+
+        if (
+            elementoIngresos
+        ) {
 
             elementoIngresos.textContent =
-                dinero(totalVentas);
+                dinero(
+                    totalVentas
+                );
         }
 
-        if (elementoEgresos) {
+
+        if (
+            elementoEgresos
+        ) {
 
             elementoEgresos.textContent =
-                dinero(totalEgresos);
+                dinero(
+                    totalEgresos
+                );
         }
 
-        if (elementoGanancia) {
+
+        if (
+            elementoGanancia
+        ) {
 
             elementoGanancia.textContent =
-                dinero(ganancia);
+                dinero(
+                    ganancia
+                );
         }
 
-        if (elementoProductos) {
+
+        if (
+            elementoProductos
+        ) {
 
             elementoProductos.textContent =
                 productosVendidos;
         }
 
+
         await cargarStock();
 
-        cargarTablaVentasAno(pedidosAño);
+
+        cargarTablaVentasAno(
+            pedidosAño
+        );
+
 
         await cargarIngresos();
     }
@@ -1409,16 +1858,24 @@ document.addEventListener("DOMContentLoaded", function () {
        TABLA DE VENTAS
     ===================================================== */
 
-    function cargarTablaVentasAno(pedidos) {
+    function cargarTablaVentasAno(
+        pedidos
+    ) {
 
         const tabla =
             document.getElementById(
                 "tablaVentas"
             );
 
-        if (!tabla) return;
 
-        tabla.innerHTML = "";
+        if (!tabla) {
+            return;
+        }
+
+
+        tabla.innerHTML =
+            "";
+
 
         if (
             !pedidos ||
@@ -1437,52 +1894,72 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        pedidos.forEach(function (pedido) {
 
-            const productos =
-                obtenerProductosPedido(pedido);
+        pedidos.forEach(
+            function (pedido) {
 
-            let nombreProducto =
-                "Pedido #" + pedido.id;
+                const productos =
+                    obtenerProductosPedido(
+                        pedido
+                    );
 
-            const cantidad =
-                obtenerCantidadProductosPedido(
-                    pedido
+
+                let nombreProducto =
+                    "Pedido #" +
+                    pedido.id;
+
+
+                const cantidad =
+                    obtenerCantidadProductosPedido(
+                        pedido
+                    );
+
+
+                if (
+                    productos.length === 1
+                ) {
+
+                    nombreProducto =
+                        productos[0]?.nombre ||
+                        productos[0]?.name ||
+                        nombreProducto;
+                }
+
+
+                const fila =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                fila.innerHTML = `
+                    <td>
+                        ${escaparHTML(
+                            nombreProducto
+                        )}
+                    </td>
+
+                    <td>
+                        ${cantidad}
+                    </td>
+
+                    <td>
+                        ${dinero(
+                            pedido.total
+                        )}
+                    </td>
+
+                    <td>
+                        Confirmada
+                    </td>
+                `;
+
+
+                tabla.appendChild(
+                    fila
                 );
-
-            if (productos.length === 1) {
-
-                nombreProducto =
-                    productos[0]?.nombre ||
-                    productos[0]?.name ||
-                    nombreProducto;
             }
-
-            const fila =
-                document.createElement("tr");
-
-            fila.innerHTML = `
-                <td>
-                    ${escaparHTML(
-                        nombreProducto
-                    )}
-                </td>
-
-                <td>
-                    ${cantidad}
-                </td>
-
-                <td>
-                    ${dinero(pedido.total)}
-                </td>
-
-                <td>
-                    Confirmada
-                </td>
-            `;
-
-            tabla.appendChild(fila);
-        });
+        );
     }
 
 
@@ -1497,12 +1974,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 "selectorAño"
             );
 
-        if (!selector) return;
+
+        if (!selector) {
+            return;
+        }
+
 
         const anoInicial = 2026;
+
         const cantidadAnios = 42;
 
         const anos = [];
+
 
         for (
             let i = 0;
@@ -1515,23 +1998,34 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
 
-        selector.innerHTML = "";
 
-        anos.forEach(function (ano) {
+        selector.innerHTML =
+            "";
 
-            const opcion =
-                document.createElement(
-                    "option"
+
+        anos.forEach(
+            function (ano) {
+
+                const opcion =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                opcion.value =
+                    String(ano);
+
+
+                opcion.textContent =
+                    String(ano);
+
+
+                selector.appendChild(
+                    opcion
                 );
+            }
+        );
 
-            opcion.value =
-                String(ano);
-
-            opcion.textContent =
-                String(ano);
-
-            selector.appendChild(opcion);
-        });
 
         const guardado =
             Number(
@@ -1540,40 +2034,60 @@ document.addEventListener("DOMContentLoaded", function () {
                 )
             );
 
+
         let anoSeleccionado;
 
+
         if (
-            Number.isInteger(guardado) &&
-            anos.includes(guardado)
+            Number.isInteger(
+                guardado
+            ) &&
+            anos.includes(
+                guardado
+            )
         ) {
 
-            anoSeleccionado = guardado;
+            anoSeleccionado =
+                guardado;
 
         } else {
 
             const anoActual =
-                new Date().getFullYear();
+                new Date()
+                    .getFullYear();
+
 
             anoSeleccionado =
-                anos.includes(anoActual)
+                anos.includes(
+                    anoActual
+                )
                     ? anoActual
                     : anoInicial;
         }
 
+
         selector.value =
-            String(anoSeleccionado);
+            String(
+                anoSeleccionado
+            );
+
 
         localStorage.setItem(
             ANO_KEY,
-            String(anoSeleccionado)
+            String(
+                anoSeleccionado
+            )
         );
+
 
         const anoTexto =
             document.getElementById(
                 "añoActual"
             );
 
+
         if (anoTexto) {
+
             anoTexto.textContent =
                 anoSeleccionado;
         }
@@ -1591,7 +2105,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 "listaPedidos"
             );
 
-        if (!contenedor) return;
+
+        if (!contenedor) {
+            return;
+        }
+
 
         contenedor.innerHTML = `
             <div class="sin-productos">
@@ -1605,12 +2123,16 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
 
+
         try {
 
             const resultado =
                 await obtenerTodosLosPedidos();
 
-            if (resultado.error) {
+
+            if (
+                resultado.error
+            ) {
 
                 contenedor.innerHTML = `
                     <div class="sin-productos">
@@ -1633,28 +2155,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
+
             const añoSeleccionado =
                 obtenerAnoSeleccionado();
 
+
             const pedidos =
                 (resultado.data || [])
-                    .filter(function (pedido) {
+                    .filter(
+                        function (pedido) {
 
-                        if (!pedido.creado_en) {
-                            return false;
+                            if (
+                                !pedido.creado_en
+                            ) {
+                                return false;
+                            }
+
+
+                            return (
+                                obtenerAno(
+                                    pedido.creado_en
+                                ) ===
+                                añoSeleccionado
+                            );
                         }
+                    );
 
-                        return (
-                            obtenerAno(
-                                pedido.creado_en
-                            ) ===
-                            añoSeleccionado
-                        );
-                    });
 
-            contenedor.innerHTML = "";
+            contenedor.innerHTML =
+                "";
 
-            if (pedidos.length === 0) {
+
+            if (
+                pedidos.length === 0
+            ) {
 
                 contenedor.innerHTML = `
                     <div class="sin-productos">
@@ -1676,13 +2210,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            pedidos.forEach(function (pedido) {
 
-                crearTarjetaPedido(
-                    pedido,
-                    contenedor
-                );
-            });
+            pedidos.forEach(
+                function (pedido) {
+
+                    crearTarjetaPedido(
+                        pedido,
+                        contenedor
+                    );
+                }
+            );
 
         } catch (error) {
 
@@ -1690,6 +2227,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "❌ Error inesperado cargando pedidos:",
                 error
             );
+
 
             contenedor.innerHTML = `
                 <div class="sin-productos">
@@ -1722,29 +2260,42 @@ document.addEventListener("DOMContentLoaded", function () {
     ) {
 
         const tarjeta =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         tarjeta.className =
             "producto-card";
+
 
         const nombreCliente =
             pedido.cliente_nombre ||
             "Cliente";
 
+
         const correoCliente =
             pedido.cliente_correo ||
             "";
 
+
         const total =
-            obtenerTotalPedido(pedido);
+            obtenerTotalPedido(
+                pedido
+            );
+
 
         const cantidad =
             obtenerCantidadProductosPedido(
                 pedido
             );
 
+
         const productos =
-            obtenerProductosPedido(pedido);
+            obtenerProductosPedido(
+                pedido
+            );
+
 
         const confirmado =
             String(
@@ -1752,51 +2303,61 @@ document.addEventListener("DOMContentLoaded", function () {
             ).toLowerCase() ===
             "confirmada";
 
+
         const puntosValidados =
             pedido.puntos_validados === true;
 
+
         const puntosGenerados =
             Number(
-                pedido.puntos_generados ??
-                pedido.puntos ??
-                0
+                pedido.puntos_generados ?? 0
             ) || 0;
 
-        let listaProductos = "";
 
-        if (productos.length > 0) {
+        let listaProductos =
+            "";
+
+
+        if (
+            productos.length > 0
+        ) {
 
             listaProductos =
                 productos
-                    .map(function (producto) {
+                    .map(
+                        function (producto) {
 
-                        const nombre =
-                            obtenerNombreProductoPedido(
-                                producto
-                            ) ||
-                            "Producto";
+                            const nombre =
+                                obtenerNombreProductoPedido(
+                                    producto
+                                ) ||
+                                "Producto";
 
-                        const cantidadProducto =
-                            obtenerCantidadProducto(
-                                producto
-                            );
 
-                        return `
-                            <div style="
-                                margin:5px 0;
-                                color:#ccc;
-                            ">
+                            const cantidadProducto =
+                                obtenerCantidadProducto(
+                                    producto
+                                );
 
-                                <i class="fa-solid fa-box"></i>
 
-                                ${escaparHTML(nombre)}
+                            return `
+                                <div style="
+                                    margin:5px 0;
+                                    color:#ccc;
+                                ">
 
-                                × ${cantidadProducto}
+                                    <i class="fa-solid fa-box"></i>
 
-                            </div>
-                        `;
+                                    ${escaparHTML(
+                                        nombre
+                                    )}
 
-                    })
+                                    × ${cantidadProducto}
+
+                                </div>
+                            `;
+                        }
+                    )
                     .join("");
 
         } else {
@@ -1813,7 +2374,9 @@ document.addEventListener("DOMContentLoaded", function () {
            ESTADO
         ================================================= */
 
-        let estadoHTML = "";
+        let estadoHTML =
+            "";
+
 
         if (confirmado) {
 
@@ -1856,24 +2419,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         /* =================================================
-           BOTÓN CONFIRMAR
+           ID SEGURO
 
            IMPORTANTE:
+
            NO usar Number(pedido.id)
 
-           Así funciona con:
-           - números
-           - UUID
-           - texto
+           porque puede ser UUID.
         ================================================= */
 
         const pedidoIdSeguro =
             encodeURIComponent(
-                String(pedido.id)
+                String(
+                    pedido.id
+                )
             );
 
 
-        let botonConfirmar = "";
+        /* =================================================
+           BOTÓN CONFIRMAR
+        ================================================= */
+
+        let botonConfirmar =
+            "";
+
 
         if (!confirmado) {
 
@@ -1931,7 +2500,9 @@ document.addEventListener("DOMContentLoaded", function () {
            BOTÓN PUNTOS
         ================================================= */
 
-        let botonPuntos = "";
+        let botonPuntos =
+            "";
+
 
         if (!confirmado) {
 
@@ -1957,7 +2528,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 </button>
             `;
 
-        } else if (puntosValidados) {
+        } else if (
+            puntosValidados
+        ) {
 
             botonPuntos = `
                 <button
@@ -1985,9 +2558,14 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
 
             const puntosCalculados =
-                calcularPuntos(total);
+                calcularPuntos(
+                    total
+                );
 
-            if (puntosCalculados > 0) {
+
+            if (
+                puntosCalculados > 0
+            ) {
 
                 botonPuntos = `
                     <button
@@ -2053,15 +2631,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 <span class="mini-titulo">
 
-                    PEDIDO #${escaparHTML(pedido.id)}
+                    PEDIDO #${escaparHTML(
+                        pedido.id
+                    )}
 
                 </span>
 
+
                 <h3 style="margin-top:8px;">
 
-                    ${escaparHTML(nombreCliente)}
+                    ${escaparHTML(
+                        nombreCliente
+                    )}
 
                 </h3>
+
 
                 ${
                     correoCliente
@@ -2081,6 +2665,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         `
                         : ""
                 }
+
 
                 <p style="
                     color:#999;
@@ -2106,6 +2691,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 </p>
 
+
                 <div style="
                     margin-top:15px;
                     padding:12px;
@@ -2121,6 +2707,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     </strong>
 
+
                     <div style="
                         margin-top:8px;
                     ">
@@ -2131,6 +2718,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 </div>
 
+
                 <div style="
                     margin-top:15px;
                     display:flex;
@@ -2138,6 +2726,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     flex-wrap:wrap;
                     align-items:center;
                 ">
+
 
                     <div>
 
@@ -2151,11 +2740,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         </span>
 
+
                         <strong>
                             ${cantidad}
                         </strong>
 
                     </div>
+
 
                     <div>
 
@@ -2169,16 +2760,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         </span>
 
+
                         <strong style="
                             color:#d8b56a;
                             font-size:18px;
                         ">
 
-                            ${dinero(total)}
+                            ${dinero(
+                                total
+                            )}
 
                         </strong>
 
                     </div>
+
 
                     <div>
 
@@ -2186,7 +2781,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     </div>
 
+
                 </div>
+
 
                 <div style="
                     margin-top:18px;
@@ -2198,82 +2795,107 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 </div>
 
+
             </div>
         `;
 
-        contenedor.appendChild(tarjeta);
+
+        contenedor.appendChild(
+            tarjeta
+        );
     }
 
 
     /* =====================================================
-       STOCK
+       PREPARAR PRODUCTOS PARA STOCK
     ===================================================== */
 
-    function prepararProductosParaStock(pedido) {
+    function prepararProductosParaStock(
+        pedido
+    ) {
 
         const productos =
-            obtenerProductosPedido(pedido);
+            obtenerProductosPedido(
+                pedido
+            );
+
 
         const productosAgrupados =
             new Map();
 
-        productos.forEach(function (producto) {
 
-            const id =
-                obtenerIdProductoPedido(
-                    producto
-                );
+        productos.forEach(
+            function (producto) {
 
-            const nombre =
-                obtenerNombreProductoPedido(
-                    producto
-                );
-
-            const cantidad =
-                obtenerCantidadProducto(
-                    producto
-                );
-
-            const clave =
-                id !== null &&
-                id !== undefined &&
-                id !== ""
-                    ? "id:" + String(id)
-                    : "nombre:" +
-                        String(nombre)
-                            .trim()
-                            .toLowerCase();
-
-            if (
-                productosAgrupados.has(clave)
-            ) {
-
-                const existente =
-                    productosAgrupados.get(
-                        clave
+                const id =
+                    obtenerIdProductoPedido(
+                        producto
                     );
 
-                existente.cantidad +=
-                    cantidad;
 
-            } else {
+                const nombre =
+                    obtenerNombreProductoPedido(
+                        producto
+                    );
 
-                productosAgrupados.set(
-                    clave,
-                    {
-                        id,
-                        nombre,
-                        cantidad
-                    }
-                );
+
+                const cantidad =
+                    obtenerCantidadProducto(
+                        producto
+                    );
+
+
+                const clave =
+                    id !== null &&
+                    id !== undefined &&
+                    id !== ""
+                        ? "id:" +
+                          String(id)
+                        : "nombre:" +
+                          String(nombre)
+                              .trim()
+                              .toLowerCase();
+
+
+                if (
+                    productosAgrupados.has(
+                        clave
+                    )
+                ) {
+
+                    const existente =
+                        productosAgrupados.get(
+                            clave
+                        );
+
+
+                    existente.cantidad +=
+                        cantidad;
+
+                } else {
+
+                    productosAgrupados.set(
+                        clave,
+                        {
+                            id,
+                            nombre,
+                            cantidad
+                        }
+                    );
+                }
             }
-        });
+        );
+
 
         return Array.from(
             productosAgrupados.values()
         );
     }
 
+
+    /* =====================================================
+       BUSCAR PRODUCTO PARA STOCK
+    ===================================================== */
 
     async function buscarProductoParaStock(
         productoPedido
@@ -2282,11 +2904,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const id =
             productoPedido.id;
 
+
         const nombre =
             productoPedido.nombre;
 
 
-        /* BUSCAR POR ID */
+        /* ==========================================
+           BUSCAR POR ID
+        ========================================== */
 
         if (
             id !== null &&
@@ -2297,13 +2922,18 @@ document.addEventListener("DOMContentLoaded", function () {
             const {
                 data,
                 error
-            } = await supabaseClient
-                .from("productos")
-                .select(
-                    "id,nombre,stock,activo"
-                )
-                .eq("id", id)
-                .maybeSingle();
+            } =
+                await supabaseClient
+                    .from("productos")
+                    .select(
+                        "id,nombre,stock,activo"
+                    )
+                    .eq(
+                        "id",
+                        id
+                    )
+                    .maybeSingle();
+
 
             if (error) {
 
@@ -2315,13 +2945,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
+
             if (data) {
                 return data;
             }
         }
 
 
-        /* BUSCAR POR NOMBRE */
+        /* ==========================================
+           BUSCAR POR NOMBRE
+        ========================================== */
 
         if (
             nombre &&
@@ -2331,16 +2964,20 @@ document.addEventListener("DOMContentLoaded", function () {
             const {
                 data,
                 error
-            } = await supabaseClient
-                .from("productos")
-                .select(
-                    "id,nombre,stock,activo"
-                )
-                .ilike(
-                    "nombre",
-                    String(nombre).trim()
-                )
-                .limit(1);
+            } =
+                await supabaseClient
+                    .from("productos")
+                    .select(
+                        "id,nombre,stock,activo"
+                    )
+                    .ilike(
+                        "nombre",
+                        String(
+                            nombre
+                        ).trim()
+                    )
+                    .limit(1);
+
 
             if (error) {
 
@@ -2352,6 +2989,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
+
             if (
                 data &&
                 data.length > 0
@@ -2361,17 +2999,28 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
+
         return null;
     }
 
+
+    /* =====================================================
+       RESTAURAR STOCK
+    ===================================================== */
 
     async function restaurarStock(
         productos
     ) {
 
-        if (!Array.isArray(productos)) {
+        if (
+            !Array.isArray(
+                productos
+            )
+        ) {
+
             return;
         }
+
 
         for (
             const producto
@@ -2382,16 +3031,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const {
                     error
-                } = await supabaseClient
-                    .from("productos")
-                    .update({
-                        stock:
-                            producto.stockAnterior
-                    })
-                    .eq(
-                        "id",
-                        producto.id
-                    );
+                } =
+                    await supabaseClient
+                        .from("productos")
+                        .update({
+                            stock:
+                                producto.stockAnterior
+                        })
+                        .eq(
+                            "id",
+                            producto.id
+                        );
+
 
                 if (error) {
 
@@ -2414,12 +3065,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    async function descontarStockPedido(pedido) {
+    /* =====================================================
+       DESCONTAR STOCK DEL PEDIDO
+    ===================================================== */
+
+    async function descontarStockPedido(
+        pedido
+    ) {
 
         const productosPedido =
             prepararProductosParaStock(
                 pedido
             );
+
 
         if (
             productosPedido.length === 0
@@ -2430,10 +3088,14 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
 
-        const productosEncontrados = [];
+
+        const productosEncontrados =
+            [];
 
 
-        /* VERIFICAR TODO */
+        /* ==========================================
+           VERIFICAR TODO ANTES DE MODIFICAR
+        ========================================== */
 
         for (
             const productoPedido
@@ -2444,6 +3106,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 await buscarProductoParaStock(
                     productoPedido
                 );
+
 
             if (!producto) {
 
@@ -2457,7 +3120,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
-            if (producto.activo === false) {
+
+            if (
+                producto.activo === false
+            ) {
 
                 throw new Error(
                     "El producto " +
@@ -2466,10 +3132,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
-            const stockActual =
-                Number(producto.stock);
 
-            if (!Number.isFinite(stockActual)) {
+            const stockActual =
+                Number(
+                    producto.stock
+                );
+
+
+            if (
+                !Number.isFinite(
+                    stockActual
+                )
+            ) {
 
                 throw new Error(
                     "El producto " +
@@ -2478,10 +3152,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
+
             const cantidadNecesaria =
                 Number(
                     productoPedido.cantidad
                 );
+
 
             if (
                 !Number.isFinite(
@@ -2496,6 +3172,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     " no es válida."
                 );
             }
+
 
             if (
                 stockActual <
@@ -2513,6 +3190,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     cantidadNecesaria
                 );
             }
+
 
             productosEncontrados.push({
 
@@ -2536,9 +3214,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        /* ACTUALIZAR */
+        /* ==========================================
+           ACTUALIZAR STOCK
+        ========================================== */
 
-        const actualizados = [];
+        const actualizados =
+            [];
+
 
         try {
 
@@ -2549,18 +3231,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const {
                     error
-                } = await supabaseClient
-                    .from("productos")
-                    .update({
+                } =
+                    await supabaseClient
+                        .from("productos")
+                        .update({
+                            stock:
+                                producto.stockNuevo
+                        })
+                        .eq(
+                            "id",
+                            producto.id
+                        );
 
-                        stock:
-                            producto.stockNuevo
-
-                    })
-                    .eq(
-                        "id",
-                        producto.id
-                    );
 
                 if (error) {
 
@@ -2572,7 +3254,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
                 }
 
-                actualizados.push(producto);
+
+                actualizados.push(
+                    producto
+                );
+
 
                 console.log(
                     "✅ Stock actualizado:",
@@ -2589,12 +3275,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 "🔄 Restaurando stock..."
             );
 
+
             await restaurarStock(
                 actualizados
             );
 
+
             throw error;
         }
+
 
         return actualizados;
     }
@@ -2605,7 +3294,9 @@ document.addEventListener("DOMContentLoaded", function () {
     ===================================================== */
 
     window.confirmarCompra =
-        async function (pedidoId) {
+        async function (
+            pedidoId
+        ) {
 
             const confirmar =
                 window.confirm(
@@ -2614,18 +3305,31 @@ document.addEventListener("DOMContentLoaded", function () {
                     "el stock de los productos."
                 );
 
-            if (!confirmar) return;
+
+            if (!confirmar) {
+                return;
+            }
+
 
             try {
+
+                /* ==========================================
+                   OBTENER PEDIDO
+                ========================================== */
 
                 const {
                     data: pedido,
                     error: errorPedido
-                } = await supabaseClient
-                    .from("pedidos")
-                    .select("*")
-                    .eq("id", pedidoId)
-                    .maybeSingle();
+                } =
+                    await supabaseClient
+                        .from("pedidos")
+                        .select("*")
+                        .eq(
+                            "id",
+                            pedidoId
+                        )
+                        .maybeSingle();
+
 
                 if (errorPedido) {
 
@@ -2634,13 +3338,16 @@ document.addEventListener("DOMContentLoaded", function () {
                         errorPedido
                     );
 
+
                     alert(
                         "No se pudo obtener el pedido.\n\n" +
                         errorPedido.message
                     );
 
+
                     return;
                 }
+
 
                 if (!pedido) {
 
@@ -2648,8 +3355,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         "El pedido no existe."
                     );
 
+
                     return;
                 }
+
+
+                /* ==========================================
+                   EVITAR DOBLE DESCUENTO
+                ========================================== */
 
                 if (
                     String(
@@ -2663,15 +3376,19 @@ document.addEventListener("DOMContentLoaded", function () {
                         "El stock no se volverá a descontar."
                     );
 
+
                     await cargarPedidos();
+
 
                     return;
                 }
+
 
                 const productosPedido =
                     obtenerProductosPedido(
                         pedido
                     );
+
 
                 if (
                     productosPedido.length === 0
@@ -2681,10 +3398,18 @@ document.addEventListener("DOMContentLoaded", function () {
                         "No se puede confirmar este pedido porque no contiene productos."
                     );
 
+
                     return;
                 }
 
-                let productosDescontados = [];
+
+                let productosDescontados =
+                    [];
+
+
+                /* ==========================================
+                   DESCONTAR STOCK
+                ========================================== */
 
                 try {
 
@@ -2700,31 +3425,40 @@ document.addEventListener("DOMContentLoaded", function () {
                         errorStock
                     );
 
+
                     alert(
                         "NO SE CONFIRMÓ LA COMPRA.\n\n" +
                         errorStock.message
                     );
 
+
                     return;
                 }
 
+
+                /* ==========================================
+                   CONFIRMAR PEDIDO
+                ========================================== */
+
                 const {
                     error: errorConfirmar
-                } = await supabaseClient
-                    .from("pedidos")
-                    .update({
+                } =
+                    await supabaseClient
+                        .from("pedidos")
+                        .update({
 
-                        estado:
-                            "confirmada",
+                            estado:
+                                "confirmada",
 
-                        confirmado_en:
-                            new Date().toISOString()
+                            confirmado_en:
+                                new Date().toISOString()
 
-                    })
-                    .eq(
-                        "id",
-                        pedidoId
-                    );
+                        })
+                        .eq(
+                            "id",
+                            pedidoId
+                        );
+
 
                 if (errorConfirmar) {
 
@@ -2733,9 +3467,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         errorConfirmar
                     );
 
+
                     await restaurarStock(
                         productosDescontados
                     );
+
 
                     alert(
                         "No se pudo confirmar el pedido.\n\n" +
@@ -2744,17 +3480,23 @@ document.addEventListener("DOMContentLoaded", function () {
                         "El stock fue restaurado."
                     );
 
+
                     return;
                 }
+
 
                 alert(
                     "COMPRA CONFIRMADA CORRECTAMENTE.\n\n" +
                     "El stock fue descontado automáticamente."
                 );
 
+
                 await cargarStock();
+
                 await cargarPedidos();
+
                 await actualizarDashboard();
+
                 await llenarSelectorAnios();
 
             } catch (error) {
@@ -2763,6 +3505,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "❌ Error inesperado confirmando compra:",
                     error
                 );
+
 
                 alert(
                     "Ocurrió un error al confirmar la compra.\n\n" +
@@ -2773,136 +3516,70 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =====================================================
-       OBTENER O CREAR PERFIL
-       
-       ESTA ES LA CORRECCIÓN PRINCIPAL.
-
-       Si existe:
-           devuelve el perfil.
-
-       Si NO existe:
-           crea automáticamente:
-
-           id = usuarioId
-           Puntos = 0
-    ===================================================== */
-
-    async function obtenerOCrearPerfil(
-        usuarioId
-    ) {
-
-        /* ==========================================
-           BUSCAR PERFIL
-        ========================================== */
-
-        const {
-            data: perfil,
-            error: errorBusqueda
-        } = await supabaseClient
-            .from("perfiles")
-            .select('id,"Puntos"')
-            .eq("id", usuarioId)
-            .maybeSingle();
-
-        if (errorBusqueda) {
-
-            console.error(
-                "❌ Error buscando perfil:",
-                errorBusqueda
-            );
-
-            throw new Error(
-                "No se pudo buscar el perfil del cliente.\n\n" +
-                errorBusqueda.message
-            );
-        }
-
-        if (perfil) {
-
-            return perfil;
-        }
-
-
-        /* ==========================================
-           NO EXISTE → CREAR
-        ========================================== */
-
-        console.log(
-            "⚠️ No existe perfil.",
-            "Creando perfil automáticamente para:",
-            usuarioId
-        );
-
-        const {
-            data: nuevoPerfil,
-            error: errorCrear
-        } = await supabaseClient
-            .from("perfiles")
-            .insert({
-
-                id:
-                    usuarioId,
-
-                "Puntos":
-                    0
-
-            })
-            .select('id,"Puntos"')
-            .maybeSingle();
-
-        if (errorCrear) {
-
-            console.error(
-                "❌ Error creando perfil:",
-                errorCrear
-            );
-
-            throw new Error(
-                "No existe un perfil para este usuario y no se pudo crear automáticamente.\n\n" +
-                errorCrear.message
-            );
-        }
-
-        if (!nuevoPerfil) {
-
-            throw new Error(
-                "El perfil fue creado pero Supabase no devolvió los datos."
-            );
-        }
-
-        console.log(
-            "✅ Perfil creado automáticamente:",
-            nuevoPerfil
-        );
-
-        return nuevoPerfil;
-    }
-
-
-    /* =====================================================
        DAR PUNTOS
 
-       1 PUNTO POR CADA Q10
+       SISTEMA ACTUAL
 
-       IMPORTANTE:
+       NO USA:
 
-       - Crea el perfil si no existe.
-       - Suma puntos.
-       - Marca el pedido.
-       - Evita duplicados.
+       perfiles.Puntos
+
+       NO CREA:
+
+       perfiles
+
+       SOLO ACTUALIZA:
+
+       pedidos.puntos_generados
+       pedidos.puntos_validados
+       pedidos.puntos_validados_en
     ===================================================== */
 
     window.darPuntos =
-        async function (pedidoId) {
+        async function (
+            pedidoId
+        ) {
+
+            if (!pedidoId) {
+
+                alert(
+                    "No se recibió el ID del pedido."
+                );
+
+                return;
+            }
+
 
             const confirmar =
                 window.confirm(
                     "¿Deseas otorgar los puntos de esta compra?"
                 );
 
-            if (!confirmar) return;
+
+            if (!confirmar) {
+                return;
+            }
+
 
             try {
+
+                console.log(
+                    "===================================="
+                );
+
+                console.log(
+                    "⭐ GENERANDO PUNTOS"
+                );
+
+                console.log(
+                    "Pedido:",
+                    pedidoId
+                );
+
+                console.log(
+                    "===================================="
+                );
+
 
                 /* ==========================================
                    1. OBTENER PEDIDO
@@ -2911,11 +3588,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 const {
                     data: pedido,
                     error: errorPedido
-                } = await supabaseClient
-                    .from("pedidos")
-                    .select("*")
-                    .eq("id", pedidoId)
-                    .maybeSingle();
+                } =
+                    await supabaseClient
+                        .from("pedidos")
+                        .select(`
+                            id,
+                            usuario_id,
+                            total,
+                            estado,
+                            puntos_generados,
+                            puntos_validados,
+                            puntos_validados_en
+                        `)
+                        .eq(
+                            "id",
+                            pedidoId
+                        )
+                        .maybeSingle();
+
 
                 if (errorPedido) {
 
@@ -2924,19 +3614,23 @@ document.addEventListener("DOMContentLoaded", function () {
                         errorPedido
                     );
 
+
                     alert(
                         "No se pudo obtener el pedido.\n\n" +
                         errorPedido.message
                     );
 
+
                     return;
                 }
+
 
                 if (!pedido) {
 
                     alert(
                         "El pedido no existe."
                     );
+
 
                     return;
                 }
@@ -2946,10 +3640,14 @@ document.addEventListener("DOMContentLoaded", function () {
                    2. VERIFICAR CONFIRMACIÓN
                 ========================================== */
 
-                if (
+                const estado =
                     String(
                         pedido.estado || ""
-                    ).toLowerCase() !==
+                    ).toLowerCase();
+
+
+                if (
+                    estado !==
                     "confirmada"
                 ) {
 
@@ -2957,30 +3655,43 @@ document.addEventListener("DOMContentLoaded", function () {
                         "Primero debes confirmar la compra."
                     );
 
+
                     return;
                 }
 
 
                 /* ==========================================
-                   3. EVITAR DUPLICADO
+                   3. EVITAR DUPLICADOS
                 ========================================== */
 
                 if (
-                    pedido.puntos_validados === true
+                    pedido.puntos_validados ===
+                    true
                 ) {
 
+                    const puntosYaGenerados =
+                        Number(
+                            pedido.puntos_generados ||
+                            0
+                        );
+
+
                     alert(
-                        "Los puntos de este pedido ya fueron otorgados."
+                        "Los puntos de este pedido ya fueron otorgados.\n\n" +
+                        "Puntos: " +
+                        puntosYaGenerados
                     );
 
+
                     await cargarPedidos();
+
 
                     return;
                 }
 
 
                 /* ==========================================
-                   4. CALCULAR PUNTOS
+                   4. CALCULAR TOTAL
                 ========================================== */
 
                 const total =
@@ -2988,217 +3699,173 @@ document.addEventListener("DOMContentLoaded", function () {
                         pedido
                     );
 
+
                 const puntos =
-                    calcularPuntos(total);
+                    calcularPuntos(
+                        total
+                    );
+
 
                 console.log(
                     "💰 Total:",
                     total
                 );
 
+
                 console.log(
                     "⭐ Puntos:",
                     puntos
                 );
 
-                if (puntos <= 0) {
+
+                if (
+                    puntos <= 0
+                ) {
 
                     alert(
                         "Esta compra no genera puntos.\n\n" +
                         "La compra mínima para generar puntos es de Q10.00."
                     );
 
-                    return;
-                }
-
-
-                /* ==========================================
-                   5. OBTENER USUARIO
-                ========================================== */
-
-                const usuarioId =
-                    pedido.usuario_id;
-
-                if (!usuarioId) {
-
-                    alert(
-                        "Este pedido no tiene usuario_id."
-                    );
-
-                    console.error(
-                        "❌ Pedido sin usuario_id:",
-                        pedido
-                    );
 
                     return;
                 }
 
 
                 /* ==========================================
-                   6. OBTENER O CREAR PERFIL
+                   5. VERIFICAR USUARIO
+
+                   Solo comprobamos que exista el
+                   usuario_id del pedido.
+
+                   NO consultamos perfiles.
+                   NO consultamos usuarios.
                 ========================================== */
 
-                const perfil =
-                    await obtenerOCrearPerfil(
-                        usuarioId
-                    );
+                if (
+                    !pedido.usuario_id
+                ) {
 
-
-                /* ==========================================
-                   7. PUNTOS ACTUALES
-                ========================================== */
-
-                const puntosActuales =
-                    Number(
-                        perfil["Puntos"]
-                    ) || 0;
-
-                const nuevosPuntos =
-                    puntosActuales +
-                    puntos;
-
-                console.log(
-                    "⭐ Puntos actuales:",
-                    puntosActuales
-                );
-
-                console.log(
-                    "➕ Puntos a agregar:",
-                    puntos
-                );
-
-                console.log(
-                    "⭐ Nuevos puntos:",
-                    nuevosPuntos
-                );
-
-
-                /* ==========================================
-                   8. ACTUALIZAR PERFIL
-                ========================================== */
-
-                const {
-                    error: errorActualizarPerfil
-                } = await supabaseClient
-                    .from("perfiles")
-                    .update({
-
-                        "Puntos":
-                            nuevosPuntos
-
-                    })
-                    .eq(
-                        "id",
-                        usuarioId
-                    );
-
-                if (errorActualizarPerfil) {
-
-                    console.error(
-                        "❌ Error actualizando puntos:",
-                        errorActualizarPerfil
+                    console.warn(
+                        "⚠️ Pedido sin usuario_id:",
+                        pedido.id
                     );
 
                     alert(
-                        "No se pudieron agregar los puntos.\n\n" +
-                        errorActualizarPerfil.message
+                        "Este pedido no tiene usuario_id.\n\n" +
+                        "No se pueden validar los puntos de este pedido."
                     );
+
 
                     return;
                 }
 
 
                 /* ==========================================
-                   9. MARCAR PEDIDO
+                   6. GUARDAR PUNTOS DIRECTAMENTE
+                      EN EL PEDIDO
                 ========================================== */
 
                 const {
                     error: errorValidarPedido
-                } = await supabaseClient
-                    .from("pedidos")
-                    .update({
-
-                        puntos_generados:
-                            puntos,
-
-                        puntos_validados:
-                            true,
-
-                        puntos_validados_en:
-                            new Date().toISOString()
-
-                    })
-                    .eq(
-                        "id",
-                        pedidoId
-                    );
-
-                if (errorValidarPedido) {
-
-                    console.error(
-                        "❌ Error marcando puntos:",
-                        errorValidarPedido
-                    );
-
-
-                    /* ======================================
-                       REVERTIR PUNTOS
-                    ====================================== */
-
-                    const {
-                        error: errorReversion
-                    } = await supabaseClient
-                        .from("perfiles")
+                } =
+                    await supabaseClient
+                        .from("pedidos")
                         .update({
 
-                            "Puntos":
-                                puntosActuales
+                            puntos_generados:
+                                puntos,
+
+                            puntos_validados:
+                                true,
+
+                            puntos_validados_en:
+                                new Date().toISOString()
 
                         })
                         .eq(
                             "id",
-                            usuarioId
+                            pedidoId
                         );
 
-                    if (errorReversion) {
 
-                        console.error(
-                            "❌ ERROR CRÍTICO REVERTIENDO:",
-                            errorReversion
-                        );
+                if (
+                    errorValidarPedido
+                ) {
 
-                        alert(
-                            "Los puntos fueron agregados, pero ocurrió un error al validar el pedido.\n\n" +
-                            "NO vuelvas a pulsar 'Dar puntos'.\n\n" +
-                            "Revisa el pedido en Supabase."
-                        );
+                    console.error(
+                        "❌ Error guardando puntos:",
+                        errorValidarPedido
+                    );
 
-                    } else {
 
-                        alert(
-                            "No se pudo validar el pedido.\n\n" +
-                            "Los puntos fueron restaurados."
-                        );
-                    }
+                    console.error(
+                        "Detalles:",
+                        {
+                            message:
+                                errorValidarPedido.message,
+
+                            details:
+                                errorValidarPedido.details,
+
+                            hint:
+                                errorValidarPedido.hint,
+
+                            code:
+                                errorValidarPedido.code
+                        }
+                    );
+
+
+                    alert(
+                        "No se pudieron registrar los puntos.\n\n" +
+                        errorValidarPedido.message
+                    );
+
 
                     return;
                 }
 
 
                 /* ==========================================
-                   10. ÉXITO
+                   7. ÉXITO
                 ========================================== */
+
+                console.log(
+                    "✅ Puntos guardados correctamente."
+                );
+
+
+                console.log(
+                    "Pedido:",
+                    pedidoId
+                );
+
+
+                console.log(
+                    "Total:",
+                    total
+                );
+
+
+                console.log(
+                    "Puntos:",
+                    puntos
+                );
+
 
                 alert(
                     "PUNTOS OTORGADOS CORRECTAMENTE.\n\n" +
-                    "Puntos agregados: " +
-                    puntos +
+                    "Compra: " +
+                    dinero(total) +
                     "\n" +
-                    "Puntos actuales: " +
-                    nuevosPuntos
+                    "Puntos generados: " +
+                    puntos
                 );
 
+
                 await cargarPedidos();
+
 
             } catch (error) {
 
@@ -3206,6 +3873,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     "❌ Error inesperado dando puntos:",
                     error
                 );
+
 
                 alert(
                     "Ocurrió un error al otorgar los puntos.\n\n" +
@@ -3230,6 +3898,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         evento?.detail?.año
                     );
 
+
                 if (
                     !Number.isInteger(ano) ||
                     ano < 1900
@@ -3240,22 +3909,29 @@ document.addEventListener("DOMContentLoaded", function () {
                         evento?.detail?.año
                     );
 
+
                     return;
                 }
+
 
                 localStorage.setItem(
                     ANO_KEY,
                     String(ano)
                 );
 
+
                 const anoTexto =
                     document.getElementById(
                         "añoActual"
                     );
 
+
                 if (anoTexto) {
-                    anoTexto.textContent = ano;
+
+                    anoTexto.textContent =
+                        ano;
                 }
+
 
                 await actualizarDashboard();
 
@@ -3269,6 +3945,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 await cargarStock();
 
+
                 window.dispatchEvent(
                     new CustomEvent(
                         "dlLuxuryAñoCambiado",
@@ -3279,6 +3956,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
                     )
                 );
+
 
             } catch (error) {
 
@@ -3300,6 +3978,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "modalEgreso"
         );
 
+
     if (modalEgreso) {
 
         modalEgreso.addEventListener(
@@ -3310,8 +3989,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     evento.target !==
                     modalEgreso
                 ) {
+
                     return;
                 }
+
 
                 window.cerrarModalEgreso();
             }
@@ -3329,6 +4010,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "DL Luxury - iniciando dashboard..."
         );
 
+
         await llenarSelectorAnios();
 
         await cargarStock();
@@ -3342,6 +4024,7 @@ document.addEventListener("DOMContentLoaded", function () {
         mostrarEgresos();
 
         await cargarPedidos();
+
 
         console.log(
             "DL Luxury - dashboard cargado correctamente."
@@ -3359,44 +4042,58 @@ document.addEventListener("DOMContentLoaded", function () {
     window.cargarStock =
         cargarStock;
 
+
     window.cargarVentas =
         cargarVentas;
+
 
     window.cargarIngresos =
         cargarIngresos;
 
+
     window.mostrarEgresos =
         mostrarEgresos;
+
 
     window.actualizarDashboard =
         actualizarDashboard;
 
+
     window.llenarSelectorAnios =
         llenarSelectorAnios;
+
 
     window.obtenerPedidosConfirmados =
         obtenerPedidosConfirmados;
 
+
     window.cargarPedidos =
         cargarPedidos;
+
 
     window.obtenerProductosPedido =
         obtenerProductosPedido;
 
+
     window.obtenerCantidadProductosPedido =
         obtenerCantidadProductosPedido;
+
 
     window.obtenerTotalPedido =
         obtenerTotalPedido;
 
+
     window.obtenerAnoSeleccionado =
         obtenerAnoSeleccionado;
+
 
     window.calcularPuntos =
         calcularPuntos;
 
+
     window.descontarStockPedido =
         descontarStockPedido;
+
 
     window.prepararProductosParaStock =
         prepararProductosParaStock;
