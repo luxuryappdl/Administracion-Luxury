@@ -1,9 +1,10 @@
+
 /* =========================================================
    DL LUXURY
    SISTEMA DE ADMINISTRACIÓN
    SCRIPT PRINCIPAL
 
-   ESTE ARCHIVO MANEJA:
+   FUNCIONES:
 
    - Inicio
    - Ingresos
@@ -15,41 +16,23 @@
    - Confirmar compra
    - Descontar stock automáticamente
    - Dar puntos
-   - Datos económicos de pedidos confirmados
-
-   =========================================================
-
-   STOCK:
-
-   AL CONFIRMAR UNA COMPRA:
-
-   1. Se obtiene el pedido.
-   2. Se revisan sus productos.
-   3. Se verifica que exista stock suficiente.
-   4. Se descuenta la cantidad comprada.
-   5. Se confirma el pedido.
-   6. Se actualiza el Dashboard.
-
-   =========================================================
+   - Datos económicos
 
    PUNTOS:
 
-   Q10    = 1 punto
-   Q20    = 2 puntos
-   Q50    = 5 puntos
-   Q100   = 10 puntos
-   Q500   = 50 puntos
-   Q1000  = 100 puntos
+   Q10   = 1 punto
+   Q20   = 2 puntos
+   Q50   = 5 puntos
+   Q100  = 10 puntos
+   Q500  = 50 puntos
+   Q1000 = 100 puntos
 
    FÓRMULA:
 
    Math.floor(total / 10)
 
-   LÍMITE:
-
-   SIN LÍMITE DE PUNTOS POR COMPRA.
+   SIN LÍMITE
 ========================================================= */
-
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -74,14 +57,9 @@ document.addEventListener("DOMContentLoaded", function () {
        CONFIGURACIÓN
     ===================================================== */
 
-    const ANO_KEY =
-        "dlLuxuryAñoSeleccionado";
-
-    const VENTAS_KEY =
-        "dlLuxuryVentas";
-
-    const EGRESOS_KEY =
-        "dlLuxuryEgresos";
+    const ANO_KEY = "dlLuxuryAñoSeleccionado";
+    const VENTAS_KEY = "dlLuxuryVentas";
+    const EGRESOS_KEY = "dlLuxuryEgresos";
 
 
     /* =====================================================
@@ -90,8 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function dinero(numero) {
 
-        const valor =
-            Number(numero);
+        const valor = Number(numero);
 
         return "Q" +
             (
@@ -115,18 +92,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function formatearFecha(fecha) {
 
-        if (!fecha) {
-            return "";
-        }
+        if (!fecha) return "";
 
-        const fechaObj =
-            new Date(fecha);
+        const fechaObj = new Date(fecha);
 
-        if (
-            Number.isNaN(
-                fechaObj.getTime()
-            )
-        ) {
+        if (Number.isNaN(fechaObj.getTime())) {
             return "";
         }
 
@@ -143,18 +113,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function formatearHora(fecha) {
 
-        if (!fecha) {
-            return "";
-        }
+        if (!fecha) return "";
 
-        const fechaObj =
-            new Date(fecha);
+        const fechaObj = new Date(fecha);
 
-        if (
-            Number.isNaN(
-                fechaObj.getTime()
-            )
-        ) {
+        if (Number.isNaN(fechaObj.getTime())) {
             return "";
         }
 
@@ -174,14 +137,9 @@ document.addEventListener("DOMContentLoaded", function () {
             return new Date().getFullYear();
         }
 
-        const fechaObj =
-            new Date(fecha);
+        const fechaObj = new Date(fecha);
 
-        if (
-            Number.isNaN(
-                fechaObj.getTime()
-            )
-        ) {
+        if (Number.isNaN(fechaObj.getTime())) {
             return new Date().getFullYear();
         }
 
@@ -190,26 +148,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =====================================================
-       CALCULAR PUNTOS
+       PUNTOS
 
-       REGLA ACTUAL:
+       1 PUNTO POR CADA Q10
 
-       1 PUNTO POR CADA Q10.
+       Q1-Q9     = 0
+       Q10-Q19   = 1
+       Q20-Q29   = 2
+       Q50-Q59   = 5
+       Q100      = 10
+       Q500      = 50
 
-       Q10   = 1
-       Q20   = 2
-       Q50   = 5
-       Q100  = 10
-       Q500  = 50
-       Q1000 = 100
-
-       SIN LÍMITE.
+       SIN LÍMITE
     ===================================================== */
 
     function calcularPuntos(total) {
 
-        const monto =
-            Number(total) || 0;
+        const monto = Number(total) || 0;
 
         if (
             !Number.isFinite(monto) ||
@@ -218,9 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return 0;
         }
 
-        return Math.floor(
-            monto / 10
-        );
+        return Math.floor(monto / 10);
     }
 
 
@@ -235,9 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const datos =
                 localStorage.getItem(clave);
 
-            if (!datos) {
-                return [];
-            }
+            if (!datos) return [];
 
             const resultado =
                 JSON.parse(datos);
@@ -288,41 +239,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     function obtenerVentas() {
-
-        return leerDatos(
-            VENTAS_KEY
-        );
+        return leerDatos(VENTAS_KEY);
     }
 
 
     function guardarVentas(ventas) {
-
-        return guardarDatos(
-            VENTAS_KEY,
-            ventas
-        );
+        return guardarDatos(VENTAS_KEY, ventas);
     }
 
 
     function obtenerEgresos() {
-
-        return leerDatos(
-            EGRESOS_KEY
-        );
+        return leerDatos(EGRESOS_KEY);
     }
 
 
     function guardarEgresos(egresos) {
-
-        return guardarDatos(
-            EGRESOS_KEY,
-            egresos
-        );
+        return guardarDatos(EGRESOS_KEY, egresos);
     }
 
 
     /* =====================================================
-       OBTENER PEDIDOS CONFIRMADOS
+       PEDIDOS
     ===================================================== */
 
     async function obtenerPedidosConfirmados() {
@@ -332,20 +269,16 @@ document.addEventListener("DOMContentLoaded", function () {
             const {
                 data,
                 error
-            } =
-                await supabaseClient
-                    .from("pedidos")
-                    .select("*")
-                    .eq(
-                        "estado",
-                        "confirmada"
-                    )
-                    .order(
-                        "creado_en",
-                        {
-                            ascending: false
-                        }
-                    );
+            } = await supabaseClient
+                .from("pedidos")
+                .select("*")
+                .eq("estado", "confirmada")
+                .order(
+                    "creado_en",
+                    {
+                        ascending: false
+                    }
+                );
 
             if (error) {
 
@@ -362,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
 
             console.error(
-                "❌ Error inesperado obteniendo pedidos:",
+                "❌ Error inesperado:",
                 error
             );
 
@@ -371,10 +304,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
-       OBTENER TODOS LOS PEDIDOS
-    ===================================================== */
-
     async function obtenerTodosLosPedidos() {
 
         try {
@@ -382,16 +311,15 @@ document.addEventListener("DOMContentLoaded", function () {
             const {
                 data,
                 error
-            } =
-                await supabaseClient
-                    .from("pedidos")
-                    .select("*")
-                    .order(
-                        "creado_en",
-                        {
-                            ascending: false
-                        }
-                    );
+            } = await supabaseClient
+                .from("pedidos")
+                .select("*")
+                .order(
+                    "creado_en",
+                    {
+                        ascending: false
+                    }
+                );
 
             if (error) {
 
@@ -402,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 return {
                     data: [],
-                    error: error
+                    error
                 };
             }
 
@@ -414,20 +342,20 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
 
             console.error(
-                "❌ Error inesperado obteniendo pedidos:",
+                "❌ Error inesperado:",
                 error
             );
 
             return {
                 data: [],
-                error: error
+                error
             };
         }
     }
 
 
     /* =====================================================
-       OBTENER PRODUCTOS DE UN PEDIDO
+       PRODUCTOS DEL PEDIDO
     ===================================================== */
 
     function obtenerProductosPedido(pedido) {
@@ -436,23 +364,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
-            if (
-                Array.isArray(
-                    pedido?.productos
-                )
-            ) {
+            if (Array.isArray(pedido?.productos)) {
 
-                productos =
-                    pedido.productos;
+                productos = pedido.productos;
 
             } else if (
                 typeof pedido?.productos === "string"
             ) {
 
                 productos =
-                    JSON.parse(
-                        pedido.productos
-                    );
+                    JSON.parse(pedido.productos);
 
             } else if (
                 pedido?.productos &&
@@ -467,7 +388,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
 
             console.error(
-                "❌ Error leyendo productos del pedido:",
+                "❌ Error leyendo productos:",
                 error
             );
 
@@ -479,10 +400,6 @@ document.addEventListener("DOMContentLoaded", function () {
             : [];
     }
 
-
-    /* =====================================================
-       OBTENER ID DE PRODUCTO
-    ===================================================== */
 
     function obtenerIdProductoPedido(producto) {
 
@@ -496,10 +413,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
-       OBTENER NOMBRE DEL PRODUCTO
-    ===================================================== */
-
     function obtenerNombreProductoPedido(producto) {
 
         return (
@@ -511,10 +424,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-
-    /* =====================================================
-       OBTENER CANTIDAD
-    ===================================================== */
 
     function obtenerCantidadProducto(producto) {
 
@@ -537,77 +446,54 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
-       CANTIDAD TOTAL DE PRODUCTOS
-    ===================================================== */
-
     function obtenerCantidadProductosPedido(pedido) {
 
         const productos =
-            obtenerProductosPedido(
-                pedido
-            );
+            obtenerProductosPedido(pedido);
 
         let cantidadTotal = 0;
 
-        productos.forEach(
-            function (producto) {
+        productos.forEach(function (producto) {
 
-                cantidadTotal +=
-                    obtenerCantidadProducto(
-                        producto
-                    );
-            }
-        );
+            cantidadTotal +=
+                obtenerCantidadProducto(producto);
+
+        });
 
         return cantidadTotal;
     }
 
 
-    /* =====================================================
-       OBTENER TOTAL DEL PEDIDO
-    ===================================================== */
-
     function obtenerTotalPedido(pedido) {
 
         const total =
-            Number(
-                pedido?.total
-            );
+            Number(pedido?.total);
 
-        if (
-            Number.isFinite(total)
-        ) {
+        if (Number.isFinite(total)) {
             return total;
         }
 
         const productos =
-            obtenerProductosPedido(
-                pedido
-            );
+            obtenerProductosPedido(pedido);
 
         let totalCalculado = 0;
 
-        productos.forEach(
-            function (producto) {
+        productos.forEach(function (producto) {
 
-                const precio =
-                    Number(
-                        producto?.precio ??
-                        producto?.price ??
-                        producto?.precio_final ??
-                        0
-                    );
+            const precio =
+                Number(
+                    producto?.precio ??
+                    producto?.price ??
+                    producto?.precio_final ??
+                    0
+                );
 
-                const cantidad =
-                    obtenerCantidadProducto(
-                        producto
-                    );
+            const cantidad =
+                obtenerCantidadProducto(producto);
 
-                totalCalculado +=
-                    precio * cantidad;
-            }
-        );
+            totalCalculado +=
+                precio * cantidad;
+        });
 
         return totalCalculado;
     }
@@ -618,36 +504,19 @@ document.addEventListener("DOMContentLoaded", function () {
     ===================================================== */
 
     window.mostrarSeccion =
-        function (
-            id,
-            boton = null
-        ) {
+        function (id, boton = null) {
 
             const paginas = {
 
-                gorras:
-                    "gorras.html",
-
-                playeras:
-                    "playeras.html",
-
-                hoodies:
-                    "hoodies.html",
-
-                perfumes:
-                    "perfumes.html",
-
-                accesorios:
-                    "accesorios.html",
-
-                descuentos:
-                    "descuentos.html"
+                gorras: "gorras.html",
+                playeras: "playeras.html",
+                hoodies: "hoodies.html",
+                perfumes: "perfumes.html",
+                accesorios: "accesorios.html",
+                descuentos: "descuentos.html"
             };
 
-
-            if (
-                paginas[id]
-            ) {
+            if (paginas[id]) {
 
                 window.location.href =
                     paginas[id];
@@ -655,26 +524,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-
-            const secciones =
-                document.querySelectorAll(
-                    ".seccion"
-                );
-
-            secciones.forEach(
-                function (seccion) {
+            document
+                .querySelectorAll(".seccion")
+                .forEach(function (seccion) {
 
                     seccion.classList.remove(
                         "activa"
                     );
-                }
-            );
 
+                });
 
             const seccion =
-                document.getElementById(
-                    id
-                );
+                document.getElementById(id);
 
             if (seccion) {
 
@@ -683,87 +544,42 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
-
-            const menus =
-                document.querySelectorAll(
-                    ".menu"
-                );
-
-            menus.forEach(
-                function (menu) {
+            document
+                .querySelectorAll(".menu")
+                .forEach(function (menu) {
 
                     menu.classList.remove(
                         "active"
                     );
-                }
-            );
 
+                });
 
             if (boton) {
-
-                boton.classList.add(
-                    "active"
-                );
+                boton.classList.add("active");
             }
 
-
-            if (
-                id === "inicio"
-            ) {
-
+            if (id === "inicio") {
                 actualizarDashboard();
-
-                return;
             }
 
-
-            if (
-                id === "ingresos"
-            ) {
-
+            if (id === "ingresos") {
                 cargarIngresos();
-
-                return;
             }
 
-
-            if (
-                id === "ventas"
-            ) {
-
+            if (id === "ventas") {
                 actualizarDashboard();
-
-                return;
             }
 
-
-            if (
-                id === "egresos"
-            ) {
-
+            if (id === "egresos") {
                 mostrarEgresos();
-
-                return;
             }
 
-
-            if (
-                id === "stock"
-            ) {
-
+            if (id === "stock") {
                 cargarStock();
-
-                return;
             }
 
-
-            if (
-                id === "pedidos"
-            ) {
-
+            if (id === "pedidos") {
                 cargarPedidos();
-
-                return;
             }
         };
 
@@ -785,20 +601,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     "formEgreso"
                 );
 
-            if (!modal) {
-                return;
-            }
+            if (!modal) return;
 
             if (formulario) {
                 formulario.reset();
             }
 
-            modal.style.display =
-                "flex";
-
-            modal.classList.add(
-                "activo"
-            );
+            modal.style.display = "flex";
+            modal.classList.add("activo");
         };
 
 
@@ -810,16 +620,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     "modalEgreso"
                 );
 
-            if (!modal) {
-                return;
-            }
+            if (!modal) return;
 
-            modal.style.display =
-                "none";
-
-            modal.classList.remove(
-                "activo"
-            );
+            modal.style.display = "none";
+            modal.classList.remove("activo");
         };
 
 
@@ -832,7 +636,6 @@ document.addEventListener("DOMContentLoaded", function () {
             "formEgreso"
         );
 
-
     if (formularioEgreso) {
 
         formularioEgreso.addEventListener(
@@ -841,32 +644,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 evento.preventDefault();
 
-
                 const descripcionInput =
                     document.getElementById(
                         "descripcionEgreso"
                     );
-
 
                 const montoInput =
                     document.getElementById(
                         "montoEgreso"
                     );
 
-
                 const descripcion =
                     descripcionInput
                         ? descripcionInput.value.trim()
                         : "";
 
-
                 const monto =
                     montoInput
-                        ? Number(
-                            montoInput.value
-                        )
+                        ? Number(montoInput.value)
                         : 0;
-
 
                 if (!descripcion) {
 
@@ -876,7 +672,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     return;
                 }
-
 
                 if (
                     !Number.isFinite(monto) ||
@@ -890,61 +685,48 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-
                 const egresos =
                     obtenerEgresos();
-
 
                 egresos.push({
 
                     id:
                         Date.now().toString(),
 
-                    descripcion:
-                        descripcion,
+                    descripcion,
 
-                    monto:
-                        monto,
+                    monto,
 
                     fecha:
                         new Date().toISOString()
 
                 });
 
-
                 if (
                     !guardarEgresos(
                         egresos
                     )
                 ) {
-
                     return;
                 }
-
 
                 alert(
                     "Egreso guardado correctamente."
                 );
 
-
                 window.cerrarModalEgreso();
 
-
                 mostrarEgresos();
-
                 cargarIngresos();
-
                 actualizarDashboard();
-
                 llenarSelectorAnios();
-
             }
         );
     }
 
 
     /* =====================================================
-       MOSTRAR EGRESOS
+       EGRESOS
     ===================================================== */
 
     function mostrarEgresos() {
@@ -954,113 +736,82 @@ document.addEventListener("DOMContentLoaded", function () {
                 "listaEgresos"
             );
 
-        if (!contenedor) {
-            return;
-        }
-
+        if (!contenedor) return;
 
         const añoSeleccionado =
             obtenerAnoSeleccionado();
 
-
         const egresos =
             obtenerEgresos()
-                .filter(
-                    function (egreso) {
+                .filter(function (egreso) {
 
-                        return (
-                            obtenerAno(
-                                egreso.fecha
-                            ) ===
-                            añoSeleccionado
-                        );
-                    }
-                );
+                    return (
+                        obtenerAno(egreso.fecha) ===
+                        añoSeleccionado
+                    );
 
+                });
 
-        contenedor.innerHTML =
-            "";
+        contenedor.innerHTML = "";
 
-
-        if (
-            egresos.length === 0
-        ) {
+        if (egresos.length === 0) {
 
             contenedor.innerHTML = `
                 <div class="sin-productos">
-
                     <i class="fa-solid fa-money-bill-transfer"></i>
 
-                    <h3>
-                        No hay egresos
-                    </h3>
+                    <h3>No hay egresos</h3>
 
                     <p>
-                        No hay egresos registrados para ${añoSeleccionado}.
+                        No hay egresos registrados
+                        para ${añoSeleccionado}.
                     </p>
-
                 </div>
             `;
 
             return;
         }
 
-
         egresos
             .slice()
             .reverse()
-            .forEach(
-                function (egreso) {
+            .forEach(function (egreso) {
 
-                    const tarjeta =
-                        document.createElement(
-                            "div"
-                        );
+                const tarjeta =
+                    document.createElement("div");
 
+                tarjeta.className =
+                    "producto-card";
 
-                    tarjeta.className =
-                        "producto-card";
+                tarjeta.innerHTML = `
+                    <div class="producto-info">
 
+                        <span class="mini-titulo">
+                            ${formatearFecha(egreso.fecha)}
+                        </span>
 
-                    tarjeta.innerHTML = `
-                        <div class="producto-info">
+                        <h3>
+                            ${escaparHTML(
+                                egreso.descripcion
+                            )}
+                        </h3>
 
-                            <span class="mini-titulo">
-                                ${formatearFecha(
-                        egreso.fecha
-                    )}
-                            </span>
-
-                            <h3>
-                                ${escaparHTML(
-                        egreso.descripcion
-                    )}
-                            </h3>
-
-                            <div class="producto-precio">
-
-                                <strong>
-                                    ${dinero(
-                        egreso.monto
-                    )}
-                                </strong>
-
-                            </div>
-
+                        <div class="producto-precio">
+                            <strong>
+                                ${dinero(egreso.monto)}
+                            </strong>
                         </div>
-                    `;
 
+                    </div>
+                `;
 
-                    contenedor.appendChild(
-                        tarjeta
-                    );
-                }
-            );
+                contenedor.appendChild(tarjeta);
+            });
     }
 
 
     /* =====================================================
-       CARGAR STOCK
+       STOCK
     ===================================================== */
 
     async function cargarStock() {
@@ -1070,24 +821,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 "listaStock"
             );
 
-
         const totalProductosElemento =
             document.getElementById(
                 "totalProductos"
             );
-
 
         const stockTotalElemento =
             document.getElementById(
                 "stockTotal"
             );
 
-
         const stockBajoElemento =
             document.getElementById(
                 "stockBajo"
             );
-
 
         if (
             !tabla &&
@@ -1098,19 +845,16 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-
         try {
 
             const {
                 data,
                 error
-            } =
-                await supabaseClient
-                    .from("productos")
-                    .select(
-                        "id,nombre,precio,stock,categoria_id,activo"
-                    );
-
+            } = await supabaseClient
+                .from("productos")
+                .select(
+                    "id,nombre,precio,stock,categoria_id,activo"
+                );
 
             if (error) {
 
@@ -1118,7 +862,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     "❌ Error cargando stock:",
                     error
                 );
-
 
                 if (tabla) {
 
@@ -1128,8 +871,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                 Error al cargar el inventario.
                                 <br>
                                 ${escaparHTML(
-                        error.message
-                    )}
+                                    error.message
+                                )}
                             </td>
                         </tr>
                     `;
@@ -1138,80 +881,51 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-
             const productos =
                 (data || [])
-                    .filter(
-                        function (producto) {
+                    .filter(function (producto) {
 
-                            return (
-                                producto.activo !== false
-                            );
-                        }
-                    );
-
-
-            let stockTotal = 0;
-
-            let stockBajo = 0;
-
-
-            productos.forEach(
-                function (producto) {
-
-                    const stock =
-                        Number(
-                            producto.stock || 0
+                        return (
+                            producto.activo !== false
                         );
 
+                    });
 
-                    stockTotal +=
-                        stock;
+            let stockTotal = 0;
+            let stockBajo = 0;
 
+            productos.forEach(function (producto) {
 
-                    if (
-                        stock <= 5
-                    ) {
+                const stock =
+                    Number(producto.stock || 0);
 
-                        stockBajo++;
-                    }
+                stockTotal += stock;
+
+                if (stock <= 5) {
+                    stockBajo++;
                 }
-            );
-
+            });
 
             if (totalProductosElemento) {
-
                 totalProductosElemento.textContent =
                     productos.length;
             }
 
-
             if (stockTotalElemento) {
-
                 stockTotalElemento.textContent =
                     stockTotal;
             }
 
-
             if (stockBajoElemento) {
-
                 stockBajoElemento.textContent =
                     stockBajo;
             }
 
+            if (!tabla) return;
 
-            if (!tabla) {
-                return;
-            }
+            tabla.innerHTML = "";
 
-
-            tabla.innerHTML =
-                "";
-
-
-            if (
-                productos.length === 0
-            ) {
+            if (productos.length === 0) {
 
                 tabla.innerHTML = `
                     <tr>
@@ -1224,77 +938,50 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
+            productos.forEach(function (producto) {
 
-            productos.forEach(
-                function (producto) {
+                const stock =
+                    Number(producto.stock || 0);
 
-                    const stock =
-                        Number(
-                            producto.stock || 0
-                        );
+                let estado = "Disponible";
 
-
-                    let estado =
-                        "Disponible";
-
-
-                    if (
-                        stock <= 0
-                    ) {
-
-                        estado =
-                            "Agotado";
-
-                    } else if (
-                        stock <= 5
-                    ) {
-
-                        estado =
-                            "Stock bajo";
-                    }
-
-
-                    const fila =
-                        document.createElement(
-                            "tr"
-                        );
-
-
-                    fila.innerHTML = `
-                        <td>
-                            ${escaparHTML(
-                        producto.nombre
-                    )}
-                        </td>
-
-                        <td>
-                            ${obtenerNombreCategoria(
-                        producto.categoria_id
-                    )}
-                        </td>
-
-                        <td>
-                            ${dinero(
-                        producto.precio
-                    )}
-                        </td>
-
-                        <td>
-                            ${stock}
-                        </td>
-
-                        <td>
-                            ${estado}
-                        </td>
-                    `;
-
-
-                    tabla.appendChild(
-                        fila
-                    );
+                if (stock <= 0) {
+                    estado = "Agotado";
+                } else if (stock <= 5) {
+                    estado = "Stock bajo";
                 }
-            );
 
+                const fila =
+                    document.createElement("tr");
+
+                fila.innerHTML = `
+                    <td>
+                        ${escaparHTML(
+                            producto.nombre
+                        )}
+                    </td>
+
+                    <td>
+                        ${obtenerNombreCategoria(
+                            producto.categoria_id
+                        )}
+                    </td>
+
+                    <td>
+                        ${dinero(producto.precio)}
+                    </td>
+
+                    <td>
+                        ${stock}
+                    </td>
+
+                    <td>
+                        ${estado}
+                    </td>
+                `;
+
+                tabla.appendChild(fila);
+            });
 
         } catch (error) {
 
@@ -1302,7 +989,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 "❌ Error inesperado cargando stock:",
                 error
             );
-
 
             if (tabla) {
 
@@ -1318,36 +1004,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
-       NOMBRE DE CATEGORÍA
-
-       Playeras = 2
-       Gorras = 3
-       Hoodies = 4
-       Perfumes = 5
-       Accesorios = 6
-    ===================================================== */
-
     function obtenerNombreCategoria(categoriaId) {
 
         const categorias = {
 
-            2:
-                "Playeras",
+            2: "Playeras",
+            3: "Gorras",
+            4: "Hoodies",
+            5: "Perfumes",
+            6: "Accesorios"
 
-            3:
-                "Gorras",
-
-            4:
-                "Hoodies",
-
-            5:
-                "Perfumes",
-
-            6:
-                "Accesorios"
         };
-
 
         return escaparHTML(
             categorias[categoriaId] ||
@@ -1357,7 +1024,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =====================================================
-       OBTENER AÑO SELECCIONADO
+       AÑO
     ===================================================== */
 
     function obtenerAnoSeleccionado() {
@@ -1367,27 +1034,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 "selectorAño"
             );
 
-
         if (
             selector &&
             selector.value
         ) {
 
             const ano =
-                Number(
-                    selector.value
-                );
-
+                Number(selector.value);
 
             if (
                 Number.isInteger(ano) &&
                 ano >= 1900
             ) {
-
                 return ano;
             }
         }
-
 
         const guardado =
             Number(
@@ -1396,23 +1057,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 )
             );
 
-
         if (
             Number.isInteger(guardado) &&
             guardado >= 1900
         ) {
-
             return guardado;
         }
 
-
-        return new Date()
-            .getFullYear();
+        return new Date().getFullYear();
     }
 
 
     /* =====================================================
-       CARGAR VENTAS
+       VENTAS
     ===================================================== */
 
     async function cargarVentas() {
@@ -1422,125 +1079,30 @@ document.addEventListener("DOMContentLoaded", function () {
                 "tablaVentas"
             );
 
-
-        if (!tabla) {
-            return;
-        }
-
+        if (!tabla) return;
 
         const añoSeleccionado =
             obtenerAnoSeleccionado();
 
-
         const pedidos =
             await obtenerPedidosConfirmados();
 
-
         const pedidosAño =
-            pedidos.filter(
-                function (pedido) {
+            pedidos.filter(function (pedido) {
 
-                    return (
-                        obtenerAno(
-                            pedido.creado_en
-                        ) ===
-                        añoSeleccionado
-                    );
-                }
-            );
-
-
-        tabla.innerHTML =
-            "";
-
-
-        if (
-            pedidosAño.length === 0
-        ) {
-
-            tabla.innerHTML = `
-                <tr>
-                    <td colspan="4">
-                        No hay ventas registradas
-                        para este año.
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-
-        pedidosAño.forEach(
-            function (pedido) {
-
-                const productos =
-                    obtenerProductosPedido(
-                        pedido
-                    );
-
-
-                let nombreProducto =
-                    "Pedido #" +
-                    pedido.id;
-
-
-                const cantidad =
-                    obtenerCantidadProductosPedido(
-                        pedido
-                    );
-
-
-                if (
-                    productos.length === 1
-                ) {
-
-                    nombreProducto =
-                        productos[0]?.nombre ||
-                        productos[0]?.name ||
-                        nombreProducto;
-                }
-
-
-                const fila =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                fila.innerHTML = `
-                    <td>
-                        ${escaparHTML(
-                    nombreProducto
-                )}
-                    </td>
-
-                    <td>
-                        ${cantidad}
-                    </td>
-
-                    <td>
-                        ${dinero(
-                    pedido.total
-                )}
-                    </td>
-
-                    <td>
-                        Confirmada
-                    </td>
-                `;
-
-
-                tabla.appendChild(
-                    fila
+                return (
+                    obtenerAno(pedido.creado_en) ===
+                    añoSeleccionado
                 );
-            }
-        );
+
+            });
+
+        cargarTablaVentasAno(pedidosAño);
     }
 
 
     /* =====================================================
-       CARGAR INGRESOS
+       INGRESOS
     ===================================================== */
 
     async function cargarIngresos() {
@@ -1548,103 +1110,73 @@ document.addEventListener("DOMContentLoaded", function () {
         const añoSeleccionado =
             obtenerAnoSeleccionado();
 
-
         const pedidos =
             await obtenerPedidosConfirmados();
 
-
         const pedidosAño =
-            pedidos.filter(
-                function (pedido) {
+            pedidos.filter(function (pedido) {
 
-                    return (
-                        obtenerAno(
-                            pedido.creado_en
-                        ) ===
-                        añoSeleccionado
-                    );
-                }
-            );
+                return (
+                    obtenerAno(pedido.creado_en) ===
+                    añoSeleccionado
+                );
 
+            });
 
         let totalIngresos = 0;
-
         let cantidadIngresos = 0;
 
+        pedidosAño.forEach(function (pedido) {
 
-        pedidosAño.forEach(
-            function (pedido) {
+            totalIngresos +=
+                Number(pedido.total || 0);
 
-                totalIngresos +=
-                    Number(
-                        pedido.total || 0
-                    );
-
-                cantidadIngresos++;
-            }
-        );
-
+            cantidadIngresos++;
+        });
 
         const egresos =
             obtenerEgresos()
-                .filter(
-                    function (egreso) {
+                .filter(function (egreso) {
 
-                        return (
-                            obtenerAno(
-                                egreso.fecha
-                            ) ===
-                            añoSeleccionado
-                        );
-                    }
-                );
+                    return (
+                        obtenerAno(egreso.fecha) ===
+                        añoSeleccionado
+                    );
 
+                });
 
         let totalEgresos = 0;
 
+        egresos.forEach(function (egreso) {
 
-        egresos.forEach(
-            function (egreso) {
-
-                totalEgresos +=
-                    Number(
-                        egreso.monto || 0
-                    );
-            }
-        );
-
+            totalEgresos +=
+                Number(egreso.monto || 0);
+        });
 
         const ganancia =
             totalIngresos -
             totalEgresos;
-
 
         const elementoIngresos =
             document.getElementById(
                 "totalIngresos"
             );
 
-
         const cantidadElemento =
             document.getElementById(
                 "cantidadIngresos"
             );
-
 
         const gananciaElemento =
             document.getElementById(
                 "gananciaIngresos"
             );
 
-
         if (elementoIngresos) {
 
             elementoIngresos.textContent =
-                dinero(
-                    totalIngresos
-                );
+                dinero(totalIngresos);
         }
-
 
         if (cantidadElemento) {
 
@@ -1652,34 +1184,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 cantidadIngresos;
         }
 
-
         if (gananciaElemento) {
 
             gananciaElemento.textContent =
-                dinero(
-                    ganancia
-                );
+                dinero(ganancia);
         }
-
 
         const tabla =
             document.getElementById(
                 "tablaIngresos"
             );
 
+        if (!tabla) return;
 
-        if (!tabla) {
-            return;
-        }
+        tabla.innerHTML = "";
 
-
-        tabla.innerHTML =
-            "";
-
-
-        if (
-            pedidosAño.length === 0
-        ) {
+        if (pedidosAño.length === 0) {
 
             tabla.innerHTML = `
                 <tr>
@@ -1693,74 +1213,54 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        pedidosAño.forEach(function (pedido) {
 
-        pedidosAño.forEach(
-            function (pedido) {
+            const productos =
+                obtenerProductosPedido(pedido);
 
-                const productos =
-                    obtenerProductosPedido(
-                        pedido
-                    );
+            let nombreProducto =
+                "Pedido #" + pedido.id;
 
-
-                let nombreProducto =
-                    "Pedido #" +
-                    pedido.id;
-
-
-                const cantidad =
-                    obtenerCantidadProductosPedido(
-                        pedido
-                    );
-
-
-                if (
-                    productos.length === 1
-                ) {
-
-                    nombreProducto =
-                        productos[0]?.nombre ||
-                        productos[0]?.name ||
-                        nombreProducto;
-                }
-
-
-                const fila =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                fila.innerHTML = `
-                    <td>
-                        ${formatearFecha(
-                    pedido.creado_en
-                )}
-                    </td>
-
-                    <td>
-                        ${escaparHTML(
-                    nombreProducto
-                )}
-                    </td>
-
-                    <td>
-                        ${cantidad}
-                    </td>
-
-                    <td>
-                        ${dinero(
-                    pedido.total
-                )}
-                    </td>
-                `;
-
-
-                tabla.appendChild(
-                    fila
+            const cantidad =
+                obtenerCantidadProductosPedido(
+                    pedido
                 );
+
+            if (productos.length === 1) {
+
+                nombreProducto =
+                    productos[0]?.nombre ||
+                    productos[0]?.name ||
+                    nombreProducto;
             }
-        );
+
+            const fila =
+                document.createElement("tr");
+
+            fila.innerHTML = `
+                <td>
+                    ${formatearFecha(
+                        pedido.creado_en
+                    )}
+                </td>
+
+                <td>
+                    ${escaparHTML(
+                        nombreProducto
+                    )}
+                </td>
+
+                <td>
+                    ${cantidad}
+                </td>
+
+                <td>
+                    ${dinero(pedido.total)}
+                </td>
+            `;
+
+            tabla.appendChild(fila);
+        });
     }
 
 
@@ -1773,179 +1273,123 @@ document.addEventListener("DOMContentLoaded", function () {
         const anoActual =
             obtenerAnoSeleccionado();
 
-
         const selector =
             document.getElementById(
                 "selectorAño"
             );
 
-
         if (selector) {
-
             selector.value =
-                String(
-                    anoActual
-                );
+                String(anoActual);
         }
-
 
         const anoTexto =
             document.getElementById(
                 "añoActual"
             );
 
-
         if (anoTexto) {
-
             anoTexto.textContent =
                 anoActual;
         }
 
-
-        console.log(
-            "🔄 Actualizando Dashboard para el año:",
-            anoActual
-        );
-
-
         const pedidos =
             await obtenerPedidosConfirmados();
 
-
         const pedidosAño =
-            pedidos.filter(
-                function (pedido) {
+            pedidos.filter(function (pedido) {
 
-                    return (
-                        obtenerAno(
-                            pedido.creado_en
-                        ) ===
-                        anoActual
-                    );
-                }
-            );
+                return (
+                    obtenerAno(pedido.creado_en) ===
+                    anoActual
+                );
 
+            });
 
         const egresos =
             obtenerEgresos()
-                .filter(
-                    function (egreso) {
+                .filter(function (egreso) {
 
-                        return (
-                            obtenerAno(
-                                egreso.fecha
-                            ) ===
-                            anoActual
-                        );
-                    }
-                );
+                    return (
+                        obtenerAno(egreso.fecha) ===
+                        anoActual
+                    );
 
+                });
 
         let totalVentas = 0;
-
         let totalEgresos = 0;
-
         let productosVendidos = 0;
 
+        pedidosAño.forEach(function (pedido) {
 
-        pedidosAño.forEach(
-            function (pedido) {
+            totalVentas +=
+                Number(pedido.total || 0);
 
-                totalVentas +=
-                    Number(
-                        pedido.total || 0
-                    );
+            productosVendidos +=
+                obtenerCantidadProductosPedido(
+                    pedido
+                );
+        });
 
+        egresos.forEach(function (egreso) {
 
-                productosVendidos +=
-                    obtenerCantidadProductosPedido(
-                        pedido
-                    );
-            }
-        );
-
-
-        egresos.forEach(
-            function (egreso) {
-
-                totalEgresos +=
-                    Number(
-                        egreso.monto || 0
-                    );
-            }
-        );
-
+            totalEgresos +=
+                Number(egreso.monto || 0);
+        });
 
         const ganancia =
             totalVentas -
             totalEgresos;
-
 
         const elementoVentas =
             document.getElementById(
                 "totalVentas"
             );
 
-
         const elementoIngresos =
             document.getElementById(
                 "totalIngresos"
             );
-
 
         const elementoEgresos =
             document.getElementById(
                 "totalEgresos"
             );
 
-
         const elementoGanancia =
             document.getElementById(
                 "gananciaTotal"
             );
-
 
         const elementoProductos =
             document.getElementById(
                 "productosVendidos"
             );
 
-
         if (elementoVentas) {
 
             elementoVentas.textContent =
-                dinero(
-                    totalVentas
-                );
+                dinero(totalVentas);
         }
-
 
         if (elementoIngresos) {
 
             elementoIngresos.textContent =
-                dinero(
-                    totalVentas
-                );
+                dinero(totalVentas);
         }
-
 
         if (elementoEgresos) {
 
             elementoEgresos.textContent =
-                dinero(
-                    totalEgresos
-                );
+                dinero(totalEgresos);
         }
-
 
         if (elementoGanancia) {
 
             elementoGanancia.textContent =
-                dinero(
-                    ganancia
-                );
+                dinero(ganancia);
         }
-
 
         if (elementoProductos) {
 
@@ -1953,25 +1397,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 productosVendidos;
         }
 
-
-        /* =========================================
-           ACTUALIZAR STOCK
-        ========================================= */
-
         await cargarStock();
 
-
-        cargarTablaVentasAno(
-            pedidosAño
-        );
-
+        cargarTablaVentasAno(pedidosAño);
 
         await cargarIngresos();
     }
 
 
     /* =====================================================
-       TABLA VENTAS POR AÑO
+       TABLA DE VENTAS
     ===================================================== */
 
     function cargarTablaVentasAno(pedidos) {
@@ -1981,15 +1416,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 "tablaVentas"
             );
 
+        if (!tabla) return;
 
-        if (!tabla) {
-            return;
-        }
-
-
-        tabla.innerHTML =
-            "";
-
+        tabla.innerHTML = "";
 
         if (
             !pedidos ||
@@ -2008,79 +1437,57 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        pedidos.forEach(function (pedido) {
 
-        pedidos.forEach(
-            function (pedido) {
+            const productos =
+                obtenerProductosPedido(pedido);
 
-                const productos =
-                    obtenerProductosPedido(
-                        pedido
-                    );
+            let nombreProducto =
+                "Pedido #" + pedido.id;
 
-
-                let nombreProducto =
-                    "Pedido #" +
-                    pedido.id;
-
-
-                const cantidad =
-                    obtenerCantidadProductosPedido(
-                        pedido
-                    );
-
-
-                if (
-                    productos.length === 1
-                ) {
-
-                    nombreProducto =
-                        productos[0]?.nombre ||
-                        productos[0]?.name ||
-                        nombreProducto;
-                }
-
-
-                const fila =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                fila.innerHTML = `
-                    <td>
-                        ${escaparHTML(
-                    nombreProducto
-                )}
-                    </td>
-
-                    <td>
-                        ${cantidad}
-                    </td>
-
-                    <td>
-                        ${dinero(
-                    pedido.total
-                )}
-                    </td>
-
-                    <td>
-                        Confirmada
-                    </td>
-                `;
-
-
-                tabla.appendChild(
-                    fila
+            const cantidad =
+                obtenerCantidadProductosPedido(
+                    pedido
                 );
+
+            if (productos.length === 1) {
+
+                nombreProducto =
+                    productos[0]?.nombre ||
+                    productos[0]?.name ||
+                    nombreProducto;
             }
-        );
+
+            const fila =
+                document.createElement("tr");
+
+            fila.innerHTML = `
+                <td>
+                    ${escaparHTML(
+                        nombreProducto
+                    )}
+                </td>
+
+                <td>
+                    ${cantidad}
+                </td>
+
+                <td>
+                    ${dinero(pedido.total)}
+                </td>
+
+                <td>
+                    Confirmada
+                </td>
+            `;
+
+            tabla.appendChild(fila);
+        });
     }
 
 
     /* =====================================================
        SELECTOR DE AÑOS
-
-       2026 - 2067
     ===================================================== */
 
     async function llenarSelectorAnios() {
@@ -2090,22 +1497,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 "selectorAño"
             );
 
+        if (!selector) return;
 
-        if (!selector) {
-            return;
-        }
-
-
-        const anoInicial =
-            2026;
-
-
-        const cantidadAnios =
-            42;
-
+        const anoInicial = 2026;
+        const cantidadAnios = 42;
 
         const anos = [];
-
 
         for (
             let i = 0;
@@ -2118,38 +1515,23 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
 
+        selector.innerHTML = "";
 
-        selector.innerHTML =
-            "";
+        anos.forEach(function (ano) {
 
-
-        anos.forEach(
-            function (ano) {
-
-                const opcion =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                opcion.value =
-                    String(
-                        ano
-                    );
-
-
-                opcion.textContent =
-                    String(
-                        ano
-                    );
-
-
-                selector.appendChild(
-                    opcion
+            const opcion =
+                document.createElement(
+                    "option"
                 );
-            }
-        );
 
+            opcion.value =
+                String(ano);
+
+            opcion.textContent =
+                String(ano);
+
+            selector.appendChild(opcion);
+        });
 
         const guardado =
             Number(
@@ -2158,64 +1540,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 )
             );
 
-
         let anoSeleccionado;
-
 
         if (
             Number.isInteger(guardado) &&
             anos.includes(guardado)
         ) {
 
-            anoSeleccionado =
-                guardado;
+            anoSeleccionado = guardado;
 
         } else {
 
             const anoActual =
-                new Date()
-                    .getFullYear();
+                new Date().getFullYear();
 
-
-            if (
-                anos.includes(
-                    anoActual
-                )
-            ) {
-
-                anoSeleccionado =
-                    anoActual;
-
-            } else {
-
-                anoSeleccionado =
-                    anoInicial;
-            }
+            anoSeleccionado =
+                anos.includes(anoActual)
+                    ? anoActual
+                    : anoInicial;
         }
 
-
         selector.value =
-            String(
-                anoSeleccionado
-            );
-
+            String(anoSeleccionado);
 
         localStorage.setItem(
             ANO_KEY,
-            String(
-                anoSeleccionado
-            )
+            String(anoSeleccionado)
         );
-
 
         const anoTexto =
             document.getElementById(
                 "añoActual"
             );
 
-
         if (anoTexto) {
-
             anoTexto.textContent =
                 anoSeleccionado;
         }
@@ -2233,11 +1591,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "listaPedidos"
             );
 
-
-        if (!contenedor) {
-            return;
-        }
-
+        if (!contenedor) return;
 
         contenedor.innerHTML = `
             <div class="sin-productos">
@@ -2251,12 +1605,10 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
 
-
         try {
 
             const resultado =
                 await obtenerTodosLosPedidos();
-
 
             if (resultado.error) {
 
@@ -2271,8 +1623,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         <p>
                             ${escaparHTML(
-                    resultado.error.message
-                )}
+                                resultado.error.message
+                            )}
                         </p>
 
                     </div>
@@ -2281,38 +1633,28 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-
             const añoSeleccionado =
                 obtenerAnoSeleccionado();
 
-
             const pedidos =
                 (resultado.data || [])
-                    .filter(
-                        function (pedido) {
+                    .filter(function (pedido) {
 
-                            if (!pedido.creado_en) {
-                                return false;
-                            }
-
-
-                            return (
-                                obtenerAno(
-                                    pedido.creado_en
-                                ) ===
-                                añoSeleccionado
-                            );
+                        if (!pedido.creado_en) {
+                            return false;
                         }
-                    );
 
+                        return (
+                            obtenerAno(
+                                pedido.creado_en
+                            ) ===
+                            añoSeleccionado
+                        );
+                    });
 
-            contenedor.innerHTML =
-                "";
+            contenedor.innerHTML = "";
 
-
-            if (
-                pedidos.length === 0
-            ) {
+            if (pedidos.length === 0) {
 
                 contenedor.innerHTML = `
                     <div class="sin-productos">
@@ -2334,17 +1676,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
+            pedidos.forEach(function (pedido) {
 
-            pedidos.forEach(
-                function (pedido) {
-
-                    crearTarjetaPedido(
-                        pedido,
-                        contenedor
-                    );
-                }
-            );
-
+                crearTarjetaPedido(
+                    pedido,
+                    contenedor
+                );
+            });
 
         } catch (error) {
 
@@ -2352,7 +1690,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 "❌ Error inesperado cargando pedidos:",
                 error
             );
-
 
             contenedor.innerHTML = `
                 <div class="sin-productos">
@@ -2365,8 +1702,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     <p>
                         ${escaparHTML(
-                error.message
-            )}
+                            error.message
+                        )}
                     </p>
 
                 </div>
@@ -2385,42 +1722,29 @@ document.addEventListener("DOMContentLoaded", function () {
     ) {
 
         const tarjeta =
-            document.createElement(
-                "div"
-            );
-
+            document.createElement("div");
 
         tarjeta.className =
             "producto-card";
-
 
         const nombreCliente =
             pedido.cliente_nombre ||
             "Cliente";
 
-
         const correoCliente =
             pedido.cliente_correo ||
             "";
 
-
         const total =
-            obtenerTotalPedido(
-                pedido
-            );
-
+            obtenerTotalPedido(pedido);
 
         const cantidad =
             obtenerCantidadProductosPedido(
                 pedido
             );
 
-
         const productos =
-            obtenerProductosPedido(
-                pedido
-            );
-
+            obtenerProductosPedido(pedido);
 
         const confirmado =
             String(
@@ -2428,10 +1752,8 @@ document.addEventListener("DOMContentLoaded", function () {
             ).toLowerCase() ===
             "confirmada";
 
-
         const puntosValidados =
             pedido.puntos_validados === true;
-
 
         const puntosGenerados =
             Number(
@@ -2440,51 +1762,41 @@ document.addEventListener("DOMContentLoaded", function () {
                 0
             ) || 0;
 
+        let listaProductos = "";
 
-        let listaProductos =
-            "";
-
-
-        if (
-            productos.length > 0
-        ) {
+        if (productos.length > 0) {
 
             listaProductos =
                 productos
-                    .map(
-                        function (producto) {
+                    .map(function (producto) {
 
-                            const nombre =
-                                obtenerNombreProductoPedido(
-                                    producto
-                                ) ||
-                                "Producto";
+                        const nombre =
+                            obtenerNombreProductoPedido(
+                                producto
+                            ) ||
+                            "Producto";
 
+                        const cantidadProducto =
+                            obtenerCantidadProducto(
+                                producto
+                            );
 
-                            const cantidadProducto =
-                                obtenerCantidadProducto(
-                                    producto
-                                );
+                        return `
+                            <div style="
+                                margin:5px 0;
+                                color:#ccc;
+                            ">
 
+                                <i class="fa-solid fa-box"></i>
 
-                            return `
-                                <div style="
-                                    margin: 5px 0;
-                                    color: #ccc;
-                                ">
+                                ${escaparHTML(nombre)}
 
-                                    <i class="fa-solid fa-box"></i>
+                                × ${cantidadProducto}
 
-                                    ${escaparHTML(
-                                nombre
-                            )}
+                            </div>
+                        `;
 
-                                    × ${cantidadProducto}
-
-                                </div>
-                            `;
-                        }
-                    )
+                    })
                     .join("");
 
         } else {
@@ -2501,9 +1813,7 @@ document.addEventListener("DOMContentLoaded", function () {
            ESTADO
         ================================================= */
 
-        let estadoHTML =
-            "";
-
+        let estadoHTML = "";
 
         if (confirmado) {
 
@@ -2547,20 +1857,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
         /* =================================================
            BOTÓN CONFIRMAR
+
+           IMPORTANTE:
+           NO usar Number(pedido.id)
+
+           Así funciona con:
+           - números
+           - UUID
+           - texto
         ================================================= */
 
-        let botonConfirmar =
-            "";
+        const pedidoIdSeguro =
+            encodeURIComponent(
+                String(pedido.id)
+            );
 
+
+        let botonConfirmar = "";
 
         if (!confirmado) {
 
             botonConfirmar = `
                 <button
                     type="button"
-                    onclick="confirmarCompra(${Number(
-                pedido.id
-            )})"
+                    onclick="confirmarCompra(decodeURIComponent('${pedidoIdSeguro}'))"
                     style="
                         border:none;
                         cursor:pointer;
@@ -2611,9 +1931,7 @@ document.addEventListener("DOMContentLoaded", function () {
            BOTÓN PUNTOS
         ================================================= */
 
-        let botonPuntos =
-            "";
-
+        let botonPuntos = "";
 
         if (!confirmado) {
 
@@ -2667,21 +1985,14 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
 
             const puntosCalculados =
-                calcularPuntos(
-                    total
-                );
+                calcularPuntos(total);
 
-
-            if (
-                puntosCalculados > 0
-            ) {
+            if (puntosCalculados > 0) {
 
                 botonPuntos = `
                     <button
                         type="button"
-                        onclick="darPuntos(${Number(
-                    pedido.id
-                )})"
+                        onclick="darPuntos(decodeURIComponent('${pedidoIdSeguro}'))"
                         style="
                             border:none;
                             cursor:pointer;
@@ -2696,10 +2007,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         <i class="fa-solid fa-star"></i>
 
                         Dar ${puntosCalculados}
-                        ${puntosCalculados === 1
-                        ? "punto"
-                        : "puntos"
-                    }
+                        ${
+                            puntosCalculados === 1
+                                ? "punto"
+                                : "puntos"
+                        }
 
                     </button>
                 `;
@@ -2732,7 +2044,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         /* =================================================
-           HTML TARJETA
+           TARJETA
         ================================================= */
 
         tarjeta.innerHTML = `
@@ -2741,24 +2053,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 <span class="mini-titulo">
 
-                    PEDIDO #${escaparHTML(
-            pedido.id
-        )}
+                    PEDIDO #${escaparHTML(pedido.id)}
 
                 </span>
 
-
                 <h3 style="margin-top:8px;">
 
-                    ${escaparHTML(
-            nombreCliente
-        )}
+                    ${escaparHTML(nombreCliente)}
 
                 </h3>
 
-
-                ${correoCliente
-                ? `
+                ${
+                    correoCliente
+                        ? `
                             <p style="
                                 color:#999;
                                 margin:5px 0;
@@ -2767,14 +2074,13 @@ document.addEventListener("DOMContentLoaded", function () {
                                 <i class="fa-solid fa-envelope"></i>
 
                                 ${escaparHTML(
-                    correoCliente
-                )}
+                                    correoCliente
+                                )}
 
                             </p>
                         `
-                : ""
-            }
-
+                        : ""
+                }
 
                 <p style="
                     color:#999;
@@ -2784,21 +2090,21 @@ document.addEventListener("DOMContentLoaded", function () {
                     <i class="fa-solid fa-calendar"></i>
 
                     ${formatearFecha(
-                pedido.creado_en
-            )}
+                        pedido.creado_en
+                    )}
 
-                    ${pedido.creado_en
-                ? `
+                    ${
+                        pedido.creado_en
+                            ? `
                                 -
                                 ${formatearHora(
-                    pedido.creado_en
-                )}
+                                    pedido.creado_en
+                                )}
                             `
-                : ""
-            }
+                            : ""
+                    }
 
                 </p>
-
 
                 <div style="
                     margin-top:15px;
@@ -2815,7 +2121,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     </strong>
 
-
                     <div style="
                         margin-top:8px;
                     ">
@@ -2825,7 +2130,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
 
                 </div>
-
 
                 <div style="
                     margin-top:15px;
@@ -2848,13 +2152,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         </span>
 
                         <strong>
-
                             ${cantidad}
-
                         </strong>
 
                     </div>
-
 
                     <div>
 
@@ -2873,14 +2174,11 @@ document.addEventListener("DOMContentLoaded", function () {
                             font-size:18px;
                         ">
 
-                            ${dinero(
-                total
-            )}
+                            ${dinero(total)}
 
                         </strong>
 
                     </div>
-
 
                     <div>
 
@@ -2889,7 +2187,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
 
                 </div>
-
 
                 <div style="
                     margin-top:18px;
@@ -2904,113 +2201,79 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
 
-
-        contenedor.appendChild(
-            tarjeta
-        );
+        contenedor.appendChild(tarjeta);
     }
 
 
     /* =====================================================
-       PREPARAR PRODUCTOS PARA STOCK
+       STOCK
     ===================================================== */
 
     function prepararProductosParaStock(pedido) {
 
         const productos =
-            obtenerProductosPedido(
-                pedido
-            );
-
+            obtenerProductosPedido(pedido);
 
         const productosAgrupados =
             new Map();
 
+        productos.forEach(function (producto) {
 
-        productos.forEach(
-            function (producto) {
+            const id =
+                obtenerIdProductoPedido(
+                    producto
+                );
 
-                const id =
-                    obtenerIdProductoPedido(
-                        producto
-                    );
+            const nombre =
+                obtenerNombreProductoPedido(
+                    producto
+                );
 
+            const cantidad =
+                obtenerCantidadProducto(
+                    producto
+                );
 
-                const nombre =
-                    obtenerNombreProductoPedido(
-                        producto
-                    );
-
-
-                const cantidad =
-                    obtenerCantidadProducto(
-                        producto
-                    );
-
-
-                /*
-                   SI EXISTE ID:
-                   USAMOS EL ID.
-
-                   SI NO:
-                   USAMOS EL NOMBRE COMO RESPALDO.
-                */
-
-                const clave =
-                    id !== null &&
-                        id !== undefined &&
-                        id !== ""
-                        ? "id:" + String(id)
-                        : "nombre:" +
+            const clave =
+                id !== null &&
+                id !== undefined &&
+                id !== ""
+                    ? "id:" + String(id)
+                    : "nombre:" +
                         String(nombre)
                             .trim()
                             .toLowerCase();
 
+            if (
+                productosAgrupados.has(clave)
+            ) {
 
-                if (
-                    productosAgrupados.has(
+                const existente =
+                    productosAgrupados.get(
                         clave
-                    )
-                ) {
-
-                    const existente =
-                        productosAgrupados.get(
-                            clave
-                        );
-
-
-                    existente.cantidad +=
-                        cantidad;
-
-                } else {
-
-                    productosAgrupados.set(
-                        clave,
-                        {
-                            id:
-                                id,
-
-                            nombre:
-                                nombre,
-
-                            cantidad:
-                                cantidad
-                        }
                     );
-                }
-            }
-        );
 
+                existente.cantidad +=
+                    cantidad;
+
+            } else {
+
+                productosAgrupados.set(
+                    clave,
+                    {
+                        id,
+                        nombre,
+                        cantidad
+                    }
+                );
+            }
+        });
 
         return Array.from(
             productosAgrupados.values()
         );
     }
 
-
-    /* =====================================================
-       BUSCAR PRODUCTO REAL EN SUPABASE
-    ===================================================== */
 
     async function buscarProductoParaStock(
         productoPedido
@@ -3019,15 +2282,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const id =
             productoPedido.id;
 
-
         const nombre =
             productoPedido.nombre;
 
 
-        /*
-           PRIMERA OPCIÓN:
-           BUSCAR POR ID.
-        */
+        /* BUSCAR POR ID */
 
         if (
             id !== null &&
@@ -3038,26 +2297,15 @@ document.addEventListener("DOMContentLoaded", function () {
             const {
                 data,
                 error
-            } =
-                await supabaseClient
-                    .from("productos")
-                    .select(
-                        "id,nombre,stock,activo"
-                    )
-                    .eq(
-                        "id",
-                        id
-                    )
-                    .maybeSingle();
-
+            } = await supabaseClient
+                .from("productos")
+                .select(
+                    "id,nombre,stock,activo"
+                )
+                .eq("id", id)
+                .maybeSingle();
 
             if (error) {
-
-                console.error(
-                    "❌ Error buscando producto por ID:",
-                    error
-                );
-
 
                 throw new Error(
                     "No se pudo buscar el producto con ID " +
@@ -3067,18 +2315,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
-
             if (data) {
-
                 return data;
             }
         }
 
 
-        /*
-           SEGUNDA OPCIÓN:
-           BUSCAR POR NOMBRE.
-        */
+        /* BUSCAR POR NOMBRE */
 
         if (
             nombre &&
@@ -3088,26 +2331,18 @@ document.addEventListener("DOMContentLoaded", function () {
             const {
                 data,
                 error
-            } =
-                await supabaseClient
-                    .from("productos")
-                    .select(
-                        "id,nombre,stock,activo"
-                    )
-                    .ilike(
-                        "nombre",
-                        String(nombre).trim()
-                    )
-                    .limit(1);
-
+            } = await supabaseClient
+                .from("productos")
+                .select(
+                    "id,nombre,stock,activo"
+                )
+                .ilike(
+                    "nombre",
+                    String(nombre).trim()
+                )
+                .limit(1);
 
             if (error) {
-
-                console.error(
-                    "❌ Error buscando producto por nombre:",
-                    error
-                );
-
 
                 throw new Error(
                     "No se pudo buscar el producto " +
@@ -3116,7 +2351,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     error.message
                 );
             }
-
 
             if (
                 data &&
@@ -3127,25 +2361,17 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-
         return null;
     }
 
-
-    /* =====================================================
-       RESTAURAR STOCK
-    ===================================================== */
 
     async function restaurarStock(
         productos
     ) {
 
-        if (
-            !Array.isArray(productos)
-        ) {
+        if (!Array.isArray(productos)) {
             return;
         }
-
 
         for (
             const producto
@@ -3156,18 +2382,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const {
                     error
-                } =
-                    await supabaseClient
-                        .from("productos")
-                        .update({
-                            stock:
-                                producto.stockAnterior
-                        })
-                        .eq(
-                            "id",
-                            producto.id
-                        );
-
+                } = await supabaseClient
+                    .from("productos")
+                    .update({
+                        stock:
+                            producto.stockAnterior
+                    })
+                    .eq(
+                        "id",
+                        producto.id
+                    );
 
                 if (error) {
 
@@ -3190,41 +2414,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
-       DESCONTAR STOCK DE UNA COMPRA
-
-       PASO 1:
-       Buscar todos los productos.
-
-       PASO 2:
-       Verificar TODO el stock.
-
-       PASO 3:
-       Si todo está correcto,
-       descontar.
-
-       PASO 4:
-       Si falla algo,
-       restaurar lo anterior.
-
-       IMPORTANTE:
-
-       El UPDATE ya NO utiliza:
-
-       .select()
-       .maybeSingle()
-
-       porque eso podía provocar falsos errores
-       aunque Supabase hubiera realizado el UPDATE.
-    ===================================================== */
-
     async function descontarStockPedido(pedido) {
 
         const productosPedido =
             prepararProductosParaStock(
                 pedido
             );
-
 
         if (
             productosPedido.length === 0
@@ -3235,21 +2430,10 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         }
 
-
-        console.log(
-            "📦 Productos a descontar:",
-            productosPedido
-        );
+        const productosEncontrados = [];
 
 
-        const productosEncontrados =
-            [];
-
-
-        /* ==========================================
-           PASO 1
-           BUSCAR TODOS
-        ========================================== */
+        /* VERIFICAR TODO */
 
         for (
             const productoPedido
@@ -3260,7 +2444,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 await buscarProductoParaStock(
                     productoPedido
                 );
-
 
             if (!producto) {
 
@@ -3274,10 +2457,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
-
-            if (
-                producto.activo === false
-            ) {
+            if (producto.activo === false) {
 
                 throw new Error(
                     "El producto " +
@@ -3286,18 +2466,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
-
             const stockActual =
-                Number(
-                    producto.stock
-                );
+                Number(producto.stock);
 
-
-            if (
-                !Number.isFinite(
-                    stockActual
-                )
-            ) {
+            if (!Number.isFinite(stockActual)) {
 
                 throw new Error(
                     "El producto " +
@@ -3306,12 +2478,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
-
             const cantidadNecesaria =
                 Number(
                     productoPedido.cantidad
                 );
-
 
             if (
                 !Number.isFinite(
@@ -3326,11 +2496,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     " no es válida."
                 );
             }
-
-
-            /* ==========================================
-               VERIFICAR STOCK
-            ========================================== */
 
             if (
                 stockActual <
@@ -3349,7 +2514,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
-
             productosEncontrados.push({
 
                 id:
@@ -3367,21 +2531,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 stockNuevo:
                     stockActual -
                     cantidadNecesaria
+
             });
         }
 
 
-        /* ==========================================
-           PASO 2
-           ACTUALIZAR TODOS
-
-           IMPORTANTE:
-           NO usar .select().maybeSingle()
-           después del update.
-        ========================================== */
+        /* ACTUALIZAR */
 
         const actualizados = [];
-
 
         try {
 
@@ -3392,27 +2549,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const {
                     error
-                } =
-                    await supabaseClient
-                        .from("productos")
-                        .update({
+                } = await supabaseClient
+                    .from("productos")
+                    .update({
 
-                            stock:
-                                producto.stockNuevo
+                        stock:
+                            producto.stockNuevo
 
-                        })
-                        .eq(
-                            "id",
-                            producto.id
-                        );
-
+                    })
+                    .eq(
+                        "id",
+                        producto.id
+                    );
 
                 if (error) {
-
-                    console.error(
-                        "❌ Error descontando stock:",
-                        error
-                    );
 
                     throw new Error(
                         "No se pudo actualizar el stock de " +
@@ -3422,20 +2572,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
                 }
 
-
-                /*
-                   IMPORTANTE:
-
-                   Si Supabase no devuelve error,
-                   consideramos exitoso el UPDATE.
-
-                   No exigimos que data exista.
-                */
-
-                actualizados.push(
-                    producto
-                );
-
+                actualizados.push(producto);
 
                 console.log(
                     "✅ Stock actualizado:",
@@ -3446,27 +2583,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
             }
 
-
         } catch (error) {
-
-            /*
-               SI FALLA UN PRODUCTO,
-               RESTAURAMOS LOS ANTERIORES.
-            */
 
             console.log(
                 "🔄 Restaurando stock..."
             );
 
-
             await restaurarStock(
                 actualizados
             );
 
-
             throw error;
         }
-
 
         return actualizados;
     }
@@ -3474,14 +2602,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /* =====================================================
        CONFIRMAR COMPRA
-
-       AQUÍ SE DESCUENTA EL STOCK
     ===================================================== */
 
     window.confirmarCompra =
-        async function (
-            pedidoId
-        ) {
+        async function (pedidoId) {
 
             const confirmar =
                 window.confirm(
@@ -3490,31 +2614,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     "el stock de los productos."
                 );
 
-
-            if (!confirmar) {
-                return;
-            }
-
+            if (!confirmar) return;
 
             try {
-
-                /* ==========================================
-                   1. OBTENER PEDIDO
-                ========================================== */
 
                 const {
                     data: pedido,
                     error: errorPedido
-                } =
-                    await supabaseClient
-                        .from("pedidos")
-                        .select("*")
-                        .eq(
-                            "id",
-                            pedidoId
-                        )
-                        .maybeSingle();
-
+                } = await supabaseClient
+                    .from("pedidos")
+                    .select("*")
+                    .eq("id", pedidoId)
+                    .maybeSingle();
 
                 if (errorPedido) {
 
@@ -3523,16 +2634,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         errorPedido
                     );
 
-
                     alert(
                         "No se pudo obtener el pedido.\n\n" +
                         errorPedido.message
                     );
 
-
                     return;
                 }
-
 
                 if (!pedido) {
 
@@ -3540,14 +2648,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         "El pedido no existe."
                     );
 
-
                     return;
                 }
-
-
-                /* ==========================================
-                   2. EVITAR DOBLE DESCUENTO
-                ========================================== */
 
                 if (
                     String(
@@ -3561,23 +2663,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         "El stock no se volverá a descontar."
                     );
 
-
                     await cargarPedidos();
-
 
                     return;
                 }
-
-
-                /* ==========================================
-                   3. VERIFICAR PRODUCTOS
-                ========================================== */
 
                 const productosPedido =
                     obtenerProductosPedido(
                         pedido
                     );
-
 
                 if (
                     productosPedido.length === 0
@@ -3587,18 +2681,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         "No se puede confirmar este pedido porque no contiene productos."
                     );
 
-
                     return;
                 }
 
-
-                /* ==========================================
-                   4. DESCONTAR STOCK
-                ========================================== */
-
-                let productosDescontados =
-                    [];
-
+                let productosDescontados = [];
 
                 try {
 
@@ -3614,40 +2700,31 @@ document.addEventListener("DOMContentLoaded", function () {
                         errorStock
                     );
 
-
                     alert(
                         "NO SE CONFIRMÓ LA COMPRA.\n\n" +
                         errorStock.message
                     );
 
-
                     return;
                 }
 
-
-                /* ==========================================
-                   5. CONFIRMAR PEDIDO
-                ========================================== */
-
                 const {
                     error: errorConfirmar
-                } =
-                    await supabaseClient
-                        .from("pedidos")
-                        .update({
+                } = await supabaseClient
+                    .from("pedidos")
+                    .update({
 
-                            estado:
-                                "confirmada",
+                        estado:
+                            "confirmada",
 
-                            confirmado_en:
-                                new Date().toISOString()
+                        confirmado_en:
+                            new Date().toISOString()
 
-                        })
-                        .eq(
-                            "id",
-                            pedidoId
-                        );
-
+                    })
+                    .eq(
+                        "id",
+                        pedidoId
+                    );
 
                 if (errorConfirmar) {
 
@@ -3656,20 +2733,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         errorConfirmar
                     );
 
-
-                    /*
-                       RESTAURAR STOCK
-                    */
-
-                    console.log(
-                        "🔄 Intentando devolver stock porque la confirmación falló..."
-                    );
-
-
                     await restaurarStock(
                         productosDescontados
                     );
-
 
                     alert(
                         "No se pudo confirmar el pedido.\n\n" +
@@ -3678,33 +2744,18 @@ document.addEventListener("DOMContentLoaded", function () {
                         "El stock fue restaurado."
                     );
 
-
                     return;
                 }
-
-
-                /* ==========================================
-                   6. ÉXITO
-                ========================================== */
 
                 alert(
                     "COMPRA CONFIRMADA CORRECTAMENTE.\n\n" +
                     "El stock fue descontado automáticamente."
                 );
 
-
-                /* ==========================================
-                   7. RECARGAR TODO
-                ========================================== */
-
                 await cargarStock();
-
                 await cargarPedidos();
-
                 await actualizarDashboard();
-
                 await llenarSelectorAnios();
-
 
             } catch (error) {
 
@@ -3712,7 +2763,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     "❌ Error inesperado confirmando compra:",
                     error
                 );
-
 
                 alert(
                     "Ocurrió un error al confirmar la compra.\n\n" +
@@ -3723,30 +2773,134 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =====================================================
+       OBTENER O CREAR PERFIL
+       
+       ESTA ES LA CORRECCIÓN PRINCIPAL.
+
+       Si existe:
+           devuelve el perfil.
+
+       Si NO existe:
+           crea automáticamente:
+
+           id = usuarioId
+           Puntos = 0
+    ===================================================== */
+
+    async function obtenerOCrearPerfil(
+        usuarioId
+    ) {
+
+        /* ==========================================
+           BUSCAR PERFIL
+        ========================================== */
+
+        const {
+            data: perfil,
+            error: errorBusqueda
+        } = await supabaseClient
+            .from("perfiles")
+            .select('id,"Puntos"')
+            .eq("id", usuarioId)
+            .maybeSingle();
+
+        if (errorBusqueda) {
+
+            console.error(
+                "❌ Error buscando perfil:",
+                errorBusqueda
+            );
+
+            throw new Error(
+                "No se pudo buscar el perfil del cliente.\n\n" +
+                errorBusqueda.message
+            );
+        }
+
+        if (perfil) {
+
+            return perfil;
+        }
+
+
+        /* ==========================================
+           NO EXISTE → CREAR
+        ========================================== */
+
+        console.log(
+            "⚠️ No existe perfil.",
+            "Creando perfil automáticamente para:",
+            usuarioId
+        );
+
+        const {
+            data: nuevoPerfil,
+            error: errorCrear
+        } = await supabaseClient
+            .from("perfiles")
+            .insert({
+
+                id:
+                    usuarioId,
+
+                "Puntos":
+                    0
+
+            })
+            .select('id,"Puntos"')
+            .maybeSingle();
+
+        if (errorCrear) {
+
+            console.error(
+                "❌ Error creando perfil:",
+                errorCrear
+            );
+
+            throw new Error(
+                "No existe un perfil para este usuario y no se pudo crear automáticamente.\n\n" +
+                errorCrear.message
+            );
+        }
+
+        if (!nuevoPerfil) {
+
+            throw new Error(
+                "El perfil fue creado pero Supabase no devolvió los datos."
+            );
+        }
+
+        console.log(
+            "✅ Perfil creado automáticamente:",
+            nuevoPerfil
+        );
+
+        return nuevoPerfil;
+    }
+
+
+    /* =====================================================
        DAR PUNTOS
 
-       REGLA:
+       1 PUNTO POR CADA Q10
 
-       1 PUNTO POR CADA Q10.
+       IMPORTANTE:
 
-       SIN LÍMITE.
+       - Crea el perfil si no existe.
+       - Suma puntos.
+       - Marca el pedido.
+       - Evita duplicados.
     ===================================================== */
 
     window.darPuntos =
-        async function (
-            pedidoId
-        ) {
+        async function (pedidoId) {
 
             const confirmar =
                 window.confirm(
                     "¿Deseas otorgar los puntos de esta compra?"
                 );
 
-
-            if (!confirmar) {
-                return;
-            }
-
+            if (!confirmar) return;
 
             try {
 
@@ -3757,16 +2911,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 const {
                     data: pedido,
                     error: errorPedido
-                } =
-                    await supabaseClient
-                        .from("pedidos")
-                        .select("*")
-                        .eq(
-                            "id",
-                            pedidoId
-                        )
-                        .maybeSingle();
-
+                } = await supabaseClient
+                    .from("pedidos")
+                    .select("*")
+                    .eq("id", pedidoId)
+                    .maybeSingle();
 
                 if (errorPedido) {
 
@@ -3775,23 +2924,19 @@ document.addEventListener("DOMContentLoaded", function () {
                         errorPedido
                     );
 
-
                     alert(
                         "No se pudo obtener el pedido.\n\n" +
                         errorPedido.message
                     );
 
-
                     return;
                 }
-
 
                 if (!pedido) {
 
                     alert(
                         "El pedido no existe."
                     );
-
 
                     return;
                 }
@@ -3812,13 +2957,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         "Primero debes confirmar la compra."
                     );
 
-
                     return;
                 }
 
 
                 /* ==========================================
-                   3. EVITAR DOBLE PUNTUACIÓN
+                   3. EVITAR DUPLICADO
                 ========================================== */
 
                 if (
@@ -3829,9 +2973,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         "Los puntos de este pedido ya fueron otorgados."
                     );
 
-
                     await cargarPedidos();
-
 
                     return;
                 }
@@ -3846,22 +2988,25 @@ document.addEventListener("DOMContentLoaded", function () {
                         pedido
                     );
 
-
                 const puntos =
-                    calcularPuntos(
-                        total
-                    );
+                    calcularPuntos(total);
 
+                console.log(
+                    "💰 Total:",
+                    total
+                );
 
-                if (
-                    puntos <= 0
-                ) {
+                console.log(
+                    "⭐ Puntos:",
+                    puntos
+                );
+
+                if (puntos <= 0) {
 
                     alert(
                         "Esta compra no genera puntos.\n\n" +
                         "La compra mínima para generar puntos es de Q10.00."
                     );
-
 
                     return;
                 }
@@ -3874,71 +3019,29 @@ document.addEventListener("DOMContentLoaded", function () {
                 const usuarioId =
                     pedido.usuario_id;
 
-
                 if (!usuarioId) {
 
                     alert(
                         "Este pedido no tiene usuario_id."
                     );
 
-
                     console.error(
-                        "Pedido sin usuario_id:",
+                        "❌ Pedido sin usuario_id:",
                         pedido
                     );
-
 
                     return;
                 }
 
 
                 /* ==========================================
-                   6. OBTENER PERFIL
+                   6. OBTENER O CREAR PERFIL
                 ========================================== */
 
-                const {
-                    data: perfil,
-                    error: errorPerfil
-                } =
-                    await supabaseClient
-                        .from("perfiles")
-                        .select(
-                            'id,"Puntos"'
-                        )
-                        .eq(
-                            "id",
-                            usuarioId
-                        )
-                        .maybeSingle();
-
-
-                if (errorPerfil) {
-
-                    console.error(
-                        "❌ Error buscando perfil:",
-                        errorPerfil
+                const perfil =
+                    await obtenerOCrearPerfil(
+                        usuarioId
                     );
-
-
-                    alert(
-                        "No se pudo obtener el perfil del cliente.\n\n" +
-                        errorPerfil.message
-                    );
-
-
-                    return;
-                }
-
-
-                if (!perfil) {
-
-                    alert(
-                        "No existe un perfil para este usuario."
-                    );
-
-
-                    return;
-                }
 
 
                 /* ==========================================
@@ -3950,83 +3053,87 @@ document.addEventListener("DOMContentLoaded", function () {
                         perfil["Puntos"]
                     ) || 0;
 
-
                 const nuevosPuntos =
                     puntosActuales +
                     puntos;
 
+                console.log(
+                    "⭐ Puntos actuales:",
+                    puntosActuales
+                );
+
+                console.log(
+                    "➕ Puntos a agregar:",
+                    puntos
+                );
+
+                console.log(
+                    "⭐ Nuevos puntos:",
+                    nuevosPuntos
+                );
+
 
                 /* ==========================================
-                   8. ACTUALIZAR PUNTOS
+                   8. ACTUALIZAR PERFIL
                 ========================================== */
 
                 const {
                     error: errorActualizarPerfil
-                } =
-                    await supabaseClient
-                        .from("perfiles")
-                        .update({
+                } = await supabaseClient
+                    .from("perfiles")
+                    .update({
 
-                            "Puntos":
-                                nuevosPuntos
+                        "Puntos":
+                            nuevosPuntos
 
-                        })
-                        .eq(
-                            "id",
-                            usuarioId
-                        );
+                    })
+                    .eq(
+                        "id",
+                        usuarioId
+                    );
 
-
-                if (
-                    errorActualizarPerfil
-                ) {
+                if (errorActualizarPerfil) {
 
                     console.error(
                         "❌ Error actualizando puntos:",
                         errorActualizarPerfil
                     );
 
-
                     alert(
                         "No se pudieron agregar los puntos.\n\n" +
                         errorActualizarPerfil.message
                     );
-
 
                     return;
                 }
 
 
                 /* ==========================================
-                   9. MARCAR PEDIDO COMO VALIDADO
+                   9. MARCAR PEDIDO
                 ========================================== */
 
                 const {
                     error: errorValidarPedido
-                } =
-                    await supabaseClient
-                        .from("pedidos")
-                        .update({
+                } = await supabaseClient
+                    .from("pedidos")
+                    .update({
 
-                            puntos_generados:
-                                puntos,
+                        puntos_generados:
+                            puntos,
 
-                            puntos_validados:
-                                true,
+                        puntos_validados:
+                            true,
 
-                            puntos_validados_en:
-                                new Date().toISOString()
+                        puntos_validados_en:
+                            new Date().toISOString()
 
-                        })
-                        .eq(
-                            "id",
-                            pedidoId
-                        );
+                    })
+                    .eq(
+                        "id",
+                        pedidoId
+                    );
 
-
-                if (
-                    errorValidarPedido
-                ) {
+                if (errorValidarPedido) {
 
                     console.error(
                         "❌ Error marcando puntos:",
@@ -4034,52 +3141,45 @@ document.addEventListener("DOMContentLoaded", function () {
                     );
 
 
-                    /*
-                       IMPORTANTE:
-
-                       Intentamos devolver los puntos
-                       si el pedido no pudo marcarse
-                       como validado.
-                    */
+                    /* ======================================
+                       REVERTIR PUNTOS
+                    ====================================== */
 
                     const {
                         error: errorReversion
-                    } =
-                        await supabaseClient
-                            .from("perfiles")
-                            .update({
+                    } = await supabaseClient
+                        .from("perfiles")
+                        .update({
 
-                                "Puntos":
-                                    puntosActuales
+                            "Puntos":
+                                puntosActuales
 
-                            })
-                            .eq(
-                                "id",
-                                usuarioId
-                            );
-
+                        })
+                        .eq(
+                            "id",
+                            usuarioId
+                        );
 
                     if (errorReversion) {
 
                         console.error(
-                            "❌ ERROR CRÍTICO: no se pudieron revertir los puntos:",
+                            "❌ ERROR CRÍTICO REVERTIENDO:",
                             errorReversion
                         );
 
-
                         alert(
-                            "Los puntos fueron agregados, pero ocurrió un error al marcar el pedido.\n\n" +
-                            "NO vuelvas a pulsar 'Dar puntos' hasta revisar el pedido."
+                            "Los puntos fueron agregados, pero ocurrió un error al validar el pedido.\n\n" +
+                            "NO vuelvas a pulsar 'Dar puntos'.\n\n" +
+                            "Revisa el pedido en Supabase."
                         );
 
                     } else {
 
                         alert(
                             "No se pudo validar el pedido.\n\n" +
-                            "Los puntos fueron restaurados y no se otorgaron."
+                            "Los puntos fueron restaurados."
                         );
                     }
-
 
                     return;
                 }
@@ -4098,9 +3198,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     nuevosPuntos
                 );
 
-
                 await cargarPedidos();
-
 
             } catch (error) {
 
@@ -4108,7 +3206,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     "❌ Error inesperado dando puntos:",
                     error
                 );
-
 
                 alert(
                     "Ocurrió un error al otorgar los puntos.\n\n" +
@@ -4133,102 +3230,44 @@ document.addEventListener("DOMContentLoaded", function () {
                         evento?.detail?.año
                     );
 
-
                 if (
                     !Number.isInteger(ano) ||
                     ano < 1900
                 ) {
 
                     console.warn(
-                        "⚠️ Año recibido no válido:",
+                        "⚠️ Año inválido:",
                         evento?.detail?.año
                     );
-
 
                     return;
                 }
 
-
-                console.log(
-                    "📅 Año seleccionado:",
-                    ano
-                );
-
-
-                /* =========================================
-                   GUARDAR AÑO
-                ========================================= */
-
                 localStorage.setItem(
                     ANO_KEY,
-                    String(
-                        ano
-                    )
+                    String(ano)
                 );
-
-
-                /* =========================================
-                   ACTUALIZAR TEXTO
-                ========================================= */
 
                 const anoTexto =
                     document.getElementById(
                         "añoActual"
                     );
 
-
                 if (anoTexto) {
-
-                    anoTexto.textContent =
-                        ano;
+                    anoTexto.textContent = ano;
                 }
-
-
-                /* =========================================
-                   ACTUALIZAR DASHBOARD
-                ========================================= */
 
                 await actualizarDashboard();
 
-
-                /* =========================================
-                   ACTUALIZAR EGRESOS
-                ========================================= */
-
                 mostrarEgresos();
-
-
-                /* =========================================
-                   ACTUALIZAR INGRESOS
-                ========================================= */
 
                 await cargarIngresos();
 
-
-                /* =========================================
-                   ACTUALIZAR VENTAS
-                ========================================= */
-
                 await cargarVentas();
-
-
-                /* =========================================
-                   ACTUALIZAR PEDIDOS
-                ========================================= */
 
                 await cargarPedidos();
 
-
-                /* =========================================
-                   ACTUALIZAR STOCK
-                ========================================= */
-
                 await cargarStock();
-
-
-                /* =========================================
-                   AVISAR OTROS SCRIPTS
-                ========================================= */
 
                 window.dispatchEvent(
                     new CustomEvent(
@@ -4241,21 +3280,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     )
                 );
 
-
-                console.log(
-                    "✅ DL Luxury actualizado completamente para:",
-                    ano
-                );
-
-
             } catch (error) {
 
                 console.error(
-                    "❌ Error actualizando Dashboard por cambio de año:",
+                    "❌ Error actualizando año:",
                     error
                 );
             }
-
         }
     );
 
@@ -4269,7 +3300,6 @@ document.addEventListener("DOMContentLoaded", function () {
             "modalEgreso"
         );
 
-
     if (modalEgreso) {
 
         modalEgreso.addEventListener(
@@ -4280,10 +3310,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     evento.target !==
                     modalEgreso
                 ) {
-
                     return;
                 }
-
 
                 window.cerrarModalEgreso();
             }
@@ -4301,27 +3329,19 @@ document.addEventListener("DOMContentLoaded", function () {
             "DL Luxury - iniciando dashboard..."
         );
 
-
         await llenarSelectorAnios();
-
 
         await cargarStock();
 
-
         await actualizarDashboard();
-
 
         await cargarVentas();
 
-
         await cargarIngresos();
-
 
         mostrarEgresos();
 
-
         await cargarPedidos();
-
 
         console.log(
             "DL Luxury - dashboard cargado correctamente."
@@ -4339,62 +3359,44 @@ document.addEventListener("DOMContentLoaded", function () {
     window.cargarStock =
         cargarStock;
 
-
     window.cargarVentas =
         cargarVentas;
-
 
     window.cargarIngresos =
         cargarIngresos;
 
-
     window.mostrarEgresos =
         mostrarEgresos;
-
 
     window.actualizarDashboard =
         actualizarDashboard;
 
-
     window.llenarSelectorAnios =
         llenarSelectorAnios;
-
 
     window.obtenerPedidosConfirmados =
         obtenerPedidosConfirmados;
 
-
     window.cargarPedidos =
         cargarPedidos;
-
 
     window.obtenerProductosPedido =
         obtenerProductosPedido;
 
-
     window.obtenerCantidadProductosPedido =
         obtenerCantidadProductosPedido;
-
 
     window.obtenerTotalPedido =
         obtenerTotalPedido;
 
-
     window.obtenerAnoSeleccionado =
         obtenerAnoSeleccionado;
-
 
     window.calcularPuntos =
         calcularPuntos;
 
-
-    /* =====================================================
-       EXPONER FUNCIONES DE STOCK
-    ===================================================== */
-
     window.descontarStockPedido =
         descontarStockPedido;
-
 
     window.prepararProductosParaStock =
         prepararProductosParaStock;
@@ -4405,3 +3407,4 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 });
+
