@@ -1,11 +1,11 @@
-
 /* =========================================================
    DL LUXURY
    PWA - ADMINISTRACIÓN
    SERVICE WORKER
-========================================================= */
+   ========================================================= */
 
-const CACHE_NAME = "dl-luxury-admin-v7";
+const CACHE_NAME = "dl-luxury-admin-v10";
+
 
 const ARCHIVOS = [
     "./",
@@ -14,7 +14,7 @@ const ARCHIVOS = [
     "./script.js",
     "./admin.js",
     "./adonvent.js",
-    "./pedidos-admin.js",
+    "./pedidos-admin.js?v=20261004-2",
     "./anos.js",
     "./manifest.json",
     "./icono1.png",
@@ -23,72 +23,67 @@ const ARCHIVOS = [
 
 
 /* =========================================================
-   INSTALAR SERVICE WORKER
+   INSTALAR
 ========================================================= */
 
-self.addEventListener("install", event => {
+self.addEventListener(
+    "install",
+    event => {
 
-    console.log(
-        "DL Luxury: instalando PWA...",
-        CACHE_NAME
-    );
+        console.log(
+            "DL Luxury: instalando Service Worker:",
+            CACHE_NAME
+        );
 
-    event.waitUntil(
 
-        (async () => {
+        event.waitUntil(
 
-            const cache =
-                await caches.open(CACHE_NAME);
+            (async () => {
 
-            const resultados =
-                await Promise.allSettled(
+                try {
 
-                    ARCHIVOS.map(
-                        archivo =>
-                            cache.add(
-                                archivo
-                            )
-                    )
-
-                );
-
-            resultados.forEach(
-                (resultado, index) => {
-
-                    if (
-                        resultado.status ===
-                        "rejected"
-                    ) {
-
-                        console.warn(
-                            "DL Luxury: no se pudo almacenar:",
-                            ARCHIVOS[index],
-                            resultado.reason
+                    const cache =
+                        await caches.open(
+                            CACHE_NAME
                         );
 
-                    }
+
+                    await cache.addAll(
+                        ARCHIVOS
+                    );
+
+
+                    console.log(
+                        "DL Luxury: archivos guardados en caché."
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "DL Luxury: error instalando caché:",
+                        error
+                    );
 
                 }
-            );
 
-            console.log(
-                "DL Luxury: instalación completada."
-            );
 
-            /*
-             * Activar inmediatamente
-             */
-            await self.skipWaiting();
+                /*
+                 * Activar inmediatamente.
+                 */
 
-        })()
+                await self.skipWaiting();
 
-    );
+            })()
 
-});
+        );
+
+    }
+);
 
 
 /* =========================================================
-   ACTIVAR Y LIMPIAR CACHÉS ANTIGUOS
+   ACTIVAR
 ========================================================= */
 
 self.addEventListener(
@@ -96,37 +91,45 @@ self.addEventListener(
     event => {
 
         console.log(
-            "DL Luxury: activando nueva versión:",
+            "DL Luxury: activando:",
             CACHE_NAME
         );
+
 
         event.waitUntil(
 
             (async () => {
 
-                const claves =
+                const cachesExistentes =
                     await caches.keys();
+
 
                 await Promise.all(
 
-                    claves.map(
-                        async clave => {
+                    cachesExistentes.map(
+                        async cacheName => {
+
+                            /*
+                             * Eliminar cualquier caché
+                             * anterior de DL Luxury.
+                             */
 
                             if (
-                                clave.startsWith(
+                                cacheName.startsWith(
                                     "dl-luxury-admin-"
                                 ) &&
-                                clave !==
+                                cacheName !==
                                 CACHE_NAME
                             ) {
 
                                 console.log(
                                     "DL Luxury: eliminando caché antigua:",
-                                    clave
+                                    cacheName
                                 );
 
+
                                 await caches.delete(
-                                    clave
+                                    cacheName
                                 );
 
                             }
@@ -136,14 +139,18 @@ self.addEventListener(
 
                 );
 
+
                 /*
-                 * Tomar control de todas
-                 * las páginas abiertas.
+                 * Tomar control inmediatamente
+                 * de las páginas abiertas.
                  */
+
                 await self.clients.claim();
 
+
                 console.log(
-                    "DL Luxury: nueva versión activa."
+                    "DL Luxury: Service Worker activo:",
+                    CACHE_NAME
                 );
 
             })()
@@ -155,7 +162,7 @@ self.addEventListener(
 
 
 /* =========================================================
-   INTERCEPTAR PETICIONES
+   FETCH
 ========================================================= */
 
 self.addEventListener(
@@ -167,14 +174,14 @@ self.addEventListener(
 
 
         /*
-         * Solo GET
+         * Solo GET.
          */
+
         if (
             request.method !== "GET"
         ) {
 
             return;
-
         }
 
 
@@ -185,21 +192,22 @@ self.addEventListener(
 
 
         /*
-         * Solo recursos del mismo dominio
+         * Solo archivos del mismo dominio.
          */
+
         if (
             url.origin !==
             self.location.origin
         ) {
 
             return;
-
         }
 
 
         /*
-         * No interceptar Supabase
+         * NO interceptar Supabase.
          */
+
         if (
             url.hostname.includes(
                 "supabase.co"
@@ -207,24 +215,23 @@ self.addEventListener(
         ) {
 
             return;
-
         }
 
 
         /*
-         * No interceptar CDN externos
+         * NO interceptar CDN.
          */
+
         if (
             url.hostname.includes(
-                "cdnjs.cloudflare.com"
+                "jsdelivr.net"
             ) ||
             url.hostname.includes(
-                "jsdelivr.net"
+                "cdnjs.cloudflare.com"
             )
         ) {
 
             return;
-
         }
 
 
@@ -232,7 +239,7 @@ self.addEventListener(
            HTML
            
            RED PRIMERO
-           CACHÉ COMO RESPALDO
+           CACHÉ SOLO COMO RESPALDO
         ================================================= */
 
         if (
@@ -249,11 +256,16 @@ self.addEventListener(
 
                         const respuesta =
                             await fetch(
-                                request
+                                request,
+                                {
+                                    cache:
+                                        "no-store"
+                                }
                             );
 
 
                         if (
+                            respuesta &&
                             respuesta.ok
                         ) {
 
@@ -261,6 +273,7 @@ self.addEventListener(
                                 await caches.open(
                                     CACHE_NAME
                                 );
+
 
                             await cache.put(
                                 request,
@@ -275,7 +288,7 @@ self.addEventListener(
                     } catch (error) {
 
                         console.warn(
-                            "DL Luxury: sin conexión."
+                            "DL Luxury: sin conexión. Usando HTML almacenado."
                         );
 
 
@@ -290,28 +303,26 @@ self.addEventListener(
                         ) {
 
                             return guardada;
-
                         }
 
 
-                        const paginaInicio =
+                        const index =
                             await caches.match(
                                 "./index.html"
                             );
 
 
                         if (
-                            paginaInicio
+                            index
                         ) {
 
-                            return paginaInicio;
-
+                            return index;
                         }
 
 
                         return new Response(
 
-                            "No hay conexión a Internet y esta página no está guardada.",
+                            "No hay conexión a Internet y esta página no está almacenada.",
 
                             {
                                 status: 503,
@@ -331,17 +342,19 @@ self.addEventListener(
             );
 
             return;
-
         }
 
 
         /* =================================================
-           JAVASCRIPT / CSS / IMÁGENES / OTROS RECURSOS
+           JS / CSS / IMÁGENES / ARCHIVOS LOCALES
 
-           RED PRIMERO PARA ARCHIVOS LOCALES
+           RED PRIMERO
 
-           Esto evita que el teléfono se quede
-           eternamente con pedidos-admin.js viejo.
+           MUY IMPORTANTE:
+           usamos cache: "no-store"
+
+           para que el teléfono solicite
+           la versión actual al servidor.
         ================================================= */
 
         event.respondWith(
@@ -352,11 +365,16 @@ self.addEventListener(
 
                     const respuesta =
                         await fetch(
-                            request
+                            request,
+                            {
+                                cache:
+                                    "no-store"
+                            }
                         );
 
 
                     if (
+                        respuesta &&
                         respuesta.ok
                     ) {
 
@@ -364,6 +382,7 @@ self.addEventListener(
                             await caches.open(
                                 CACHE_NAME
                             );
+
 
                         await cache.put(
                             request,
@@ -378,7 +397,7 @@ self.addEventListener(
                 } catch (error) {
 
                     console.warn(
-                        "DL Luxury: no se pudo obtener recurso de red:",
+                        "DL Luxury: recurso no disponible en red:",
                         request.url
                     );
 
@@ -394,7 +413,6 @@ self.addEventListener(
                     ) {
 
                         return guardado;
-
                     }
 
 
@@ -409,3 +427,53 @@ self.addEventListener(
     }
 );
 
+
+/* =========================================================
+   MENSAJE PARA FORZAR ACTUALIZACIÓN
+========================================================= */
+
+self.addEventListener(
+    "message",
+    event => {
+
+        if (
+            event.data ===
+            "SKIP_WAITING"
+        ) {
+
+            self.skipWaiting();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   LOG
+========================================================= */
+
+console.log(
+    "========================================"
+);
+
+console.log(
+    "DL LUXURY SERVICE WORKER"
+);
+
+console.log(
+    "Versión:",
+    CACHE_NAME
+);
+
+console.log(
+    "Actualización automática activada"
+);
+
+console.log(
+    "Cache de archivos antiguos eliminado"
+);
+
+console.log(
+    "========================================"
+);
