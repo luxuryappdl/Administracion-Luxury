@@ -20,17 +20,26 @@
    SISTEMA DE PUNTOS
    =========================================================
 
-   Q1   - Q10      = 1 punto
-   Q11  - Q20      = 2 puntos
-   Q21  - Q30      = 3 puntos
-   Q91  - Q100     = 10 puntos
-   Q191 - Q200     = 20 puntos
-   Q491 - Q500     = 50 puntos
-   Q991 - Q1000    = 100 puntos
+   REGLA OFICIAL:
 
-   REGLA:
+   1 PUNTO POR CADA Q10 COMPLETOS DE COMPRA
 
-   1 PUNTO POR CADA Q10 DE COMPRA
+   EJEMPLOS:
+
+   Q1   = 0 puntos
+   Q5   = 0 puntos
+   Q9   = 0 puntos
+   Q10  = 1 punto
+   Q11  = 1 punto
+   Q19  = 1 punto
+   Q20  = 2 puntos
+   Q50  = 5 puntos
+   Q100 = 10 puntos
+   Q150 = 15 puntos
+   Q200 = 20 puntos
+   Q500 = 50 puntos
+   Q1000 = 100 puntos
+   Q5000 = 500 puntos
 
    NO EXISTE LÍMITE MÁXIMO.
 
@@ -38,12 +47,14 @@
    IMPORTANTE
    =========================================================
 
-   Los puntos se manejan ÚNICAMENTE
-   desde la tabla "pedidos".
+   Los puntos se almacenan ÚNICAMENTE
+   en la tabla "pedidos".
 
-   NO se utiliza la tabla "perfiles".
+   NO se utiliza:
 
-========================================================= */
+   perfiles.Puntos
+
+   ========================================================= */
 
 
 /* =========================================================
@@ -55,6 +66,7 @@ const SUPABASE_PEDIDOS_ADMIN_URL =
 
 const SUPABASE_PEDIDOS_ADMIN_KEY =
     "sb_publishable_Qdae9GUtmuosAPP4kemF3A_Vr4HFo0n";
+
 
 const supabasePedidosAdmin =
     window.supabase.createClient(
@@ -90,7 +102,8 @@ function escaparHTML(valor) {
 
 function dineroPedido(valor) {
 
-    const numero = Number(valor) || 0;
+    const numero =
+        Number(valor) || 0;
 
     return numero.toLocaleString(
         "es-GT",
@@ -113,9 +126,14 @@ function formatearFechaPedido(fecha) {
         return "Sin fecha";
     }
 
-    const fechaObj = new Date(fecha);
+    const fechaObj =
+        new Date(fecha);
 
-    if (Number.isNaN(fechaObj.getTime())) {
+    if (
+        Number.isNaN(
+            fechaObj.getTime()
+        )
+    ) {
         return "Sin fecha";
     }
 
@@ -140,9 +158,14 @@ function formatearHoraPedido(fecha) {
         return "";
     }
 
-    const fechaObj = new Date(fecha);
+    const fechaObj =
+        new Date(fecha);
 
-    if (Number.isNaN(fechaObj.getTime())) {
+    if (
+        Number.isNaN(
+            fechaObj.getTime()
+        )
+    ) {
         return "";
     }
 
@@ -163,21 +186,30 @@ function formatearHoraPedido(fecha) {
 function obtenerAñoSeleccionadoPedidos() {
 
     const selector =
-        document.getElementById("selectorAño");
+        document.getElementById(
+            "selectorAño"
+        );
 
     if (!selector) {
-        return new Date().getFullYear();
+
+        return new Date()
+            .getFullYear();
     }
 
     const valor =
-        Number(selector.value);
+        Number(
+            selector.value
+        );
 
-    return valor || new Date().getFullYear();
+    return (
+        valor ||
+        new Date().getFullYear()
+    );
 }
 
 
 /* =========================================================
-   OBTENER PRODUCTOS
+   OBTENER PRODUCTOS DEL PEDIDO
 ========================================================= */
 
 function obtenerProductosPedidoAdmin(pedido) {
@@ -186,21 +218,28 @@ function obtenerProductosPedidoAdmin(pedido) {
         return [];
     }
 
-    let productos = pedido.productos;
+    let productos =
+        pedido.productos;
 
     if (!productos) {
         return [];
     }
 
+
     /* =====================================================
        SI VIENE COMO TEXTO JSON
     ===================================================== */
 
-    if (typeof productos === "string") {
+    if (
+        typeof productos === "string"
+    ) {
 
         try {
 
-            productos = JSON.parse(productos);
+            productos =
+                JSON.parse(
+                    productos
+                );
 
         } catch (error) {
 
@@ -213,14 +252,22 @@ function obtenerProductosPedidoAdmin(pedido) {
         }
     }
 
+
     /* =====================================================
        SI VIENE COMO OBJETO
     ===================================================== */
 
-    if (!Array.isArray(productos)) {
+    if (
+        !Array.isArray(productos)
+    ) {
 
-        if (typeof productos === "object") {
-            return [productos];
+        if (
+            typeof productos === "object"
+        ) {
+
+            return [
+                productos
+            ];
         }
 
         return [];
@@ -237,14 +284,21 @@ function obtenerProductosPedidoAdmin(pedido) {
 function obtenerCantidadPedidoAdmin(pedido) {
 
     const productos =
-        obtenerProductosPedidoAdmin(pedido);
+        obtenerProductosPedidoAdmin(
+            pedido
+        );
 
-    if (!productos.length) {
+    if (
+        !productos.length
+    ) {
         return 0;
     }
 
     return productos.reduce(
-        (total, producto) => {
+        (
+            total,
+            producto
+        ) => {
 
             const cantidad =
                 Number(
@@ -254,7 +308,10 @@ function obtenerCantidadPedidoAdmin(pedido) {
                     1
                 ) || 1;
 
-            return total + cantidad;
+            return (
+                total +
+                cantidad
+            );
 
         },
         0
@@ -284,11 +341,19 @@ function obtenerTotalPedidoAdmin(pedido) {
 
     ];
 
-    for (const valor of posiblesValores) {
 
-        const numero = Number(valor);
+    for (
+        const valor
+        of posiblesValores
+    ) {
 
-        if (Number.isFinite(numero)) {
+        const numero =
+            Number(valor);
+
+        if (
+            Number.isFinite(numero)
+        ) {
+
             return numero;
         }
     }
@@ -303,11 +368,15 @@ function obtenerTotalPedidoAdmin(pedido) {
 
    REGLA:
 
-   1 PUNTO POR CADA Q10
+   1 PUNTO POR CADA Q10 COMPLETOS
 
-   Math.ceil(total / 10)
+   IMPORTANTE:
 
-   NO HAY LÍMITE MÁXIMO.
+   Math.floor()
+
+   NO Math.ceil()
+
+   NO EXISTE LÍMITE MÁXIMO.
 
 ========================================================= */
 
@@ -316,11 +385,19 @@ function calcularPuntosPedidoAdmin(total) {
     const valor =
         Number(total) || 0;
 
-    if (valor <= 0) {
+
+    if (
+        !Number.isFinite(valor) ||
+        valor < 10
+    ) {
+
         return 0;
     }
 
-    return Math.ceil(valor / 10);
+
+    return Math.floor(
+        valor / 10
+    );
 }
 
 
@@ -335,6 +412,7 @@ function obtenerUsuarioIdPedido(pedido) {
 
     const cliente =
         pedido?.cliente;
+
 
     return (
 
@@ -425,7 +503,10 @@ function obtenerCorreoClientePedido(pedido) {
 async function cargarPedidosAdministracion() {
 
     const contenedor =
-        document.getElementById("listaPedidos");
+        document.getElementById(
+            "listaPedidos"
+        );
+
 
     if (!contenedor) {
 
@@ -436,26 +517,31 @@ async function cargarPedidosAdministracion() {
         return;
     }
 
+
     /* =====================================================
        CARGANDO
     ===================================================== */
 
     contenedor.innerHTML = `
-        <div class="sin-tickets">
-            Cargando pedidos...
-        </div>
+    < div class="sin-tickets" >
+        Cargando pedidos...
+        </div >
     `;
+
 
     try {
 
         const año =
             obtenerAñoSeleccionadoPedidos();
 
+
         const inicio =
             `${año}-01-01T00:00:00.000Z`;
 
+
         const fin =
             `${año + 1}-01-01T00:00:00.000Z`;
+
 
         /* =================================================
            CONSULTAR PEDIDOS
@@ -468,14 +554,21 @@ async function cargarPedidosAdministracion() {
             await supabasePedidosAdmin
                 .from("pedidos")
                 .select("*")
-                .gte("creado_en", inicio)
-                .lt("creado_en", fin)
+                .gte(
+                    "creado_en",
+                    inicio
+                )
+                .lt(
+                    "creado_en",
+                    fin
+                )
                 .order(
                     "creado_en",
                     {
                         ascending: false
                     }
                 );
+
 
         /* =================================================
            ERROR
@@ -488,31 +581,39 @@ async function cargarPedidosAdministracion() {
                 error
             );
 
+
             contenedor.innerHTML = `
-                <div class="sin-tickets">
-                    Error al cargar los pedidos.
-                    <br><br>
-                    ${escaparHTMLPedidos(error.message)}
-                </div>
-            `;
+    < div class="sin-tickets" >
+        Error al cargar los pedidos.
+                    < br > <br>
+                ${escaparHTMLPedidos(
+                error.message
+            )}
+            </div>
+`;
 
             return;
         }
+
 
         /* =================================================
            SIN PEDIDOS
         ================================================= */
 
-        if (!data || !data.length) {
+        if (
+            !data ||
+            !data.length
+        ) {
 
             contenedor.innerHTML = `
-                <div class="sin-tickets">
-                    No hay pedidos para ${año}.
-                </div>
-            `;
+    < div class="sin-tickets" >
+        No hay pedidos para ${año}.
+                </div >
+    `;
 
             return;
         }
+
 
         /* =================================================
            MOSTRAR PEDIDOS
@@ -520,8 +621,11 @@ async function cargarPedidosAdministracion() {
 
         contenedor.innerHTML =
             data
-                .map(crearTarjetaPedidoAdmin)
+                .map(
+                    crearTarjetaPedidoAdmin
+                )
                 .join("");
+
 
     } catch (error) {
 
@@ -530,16 +634,17 @@ async function cargarPedidosAdministracion() {
             error
         );
 
+
         contenedor.innerHTML = `
-            <div class="sin-tickets">
-                Ocurrió un error al cargar los pedidos.
-                <br><br>
+    < div class="sin-tickets" >
+        Ocurrió un error al cargar los pedidos.
+                < br > <br>
                 ${escaparHTMLPedidos(
             error?.message ||
             "Error desconocido"
         )}
             </div>
-        `;
+`;
     }
 }
 
@@ -553,33 +658,54 @@ function crearTarjetaPedidoAdmin(pedido) {
     const id =
         pedido?.id ?? "";
 
+
     const nombre =
-        obtenerNombreClientePedido(pedido);
+        obtenerNombreClientePedido(
+            pedido
+        );
+
 
     const correo =
-        obtenerCorreoClientePedido(pedido);
+        obtenerCorreoClientePedido(
+            pedido
+        );
+
 
     const fecha =
         formatearFechaPedido(
             pedido?.creado_en
         );
 
+
     const hora =
         formatearHoraPedido(
             pedido?.creado_en
         );
 
+
     const productos =
-        obtenerProductosPedidoAdmin(pedido);
+        obtenerProductosPedidoAdmin(
+            pedido
+        );
+
 
     const cantidad =
-        obtenerCantidadPedidoAdmin(pedido);
+        obtenerCantidadPedidoAdmin(
+            pedido
+        );
+
 
     const total =
-        obtenerTotalPedidoAdmin(pedido);
+        obtenerTotalPedidoAdmin(
+            pedido
+        );
+
 
     const puntos =
-        calcularPuntosPedidoAdmin(total);
+        calcularPuntosPedidoAdmin(
+            total
+        );
+
 
     const estado =
         String(
@@ -587,8 +713,10 @@ function crearTarjetaPedidoAdmin(pedido) {
             "pendiente"
         ).toLowerCase();
 
+
     const confirmada =
         estado === "confirmada";
+
 
     const puntosValidados =
         pedido?.puntos_validados === true;
@@ -600,43 +728,55 @@ function crearTarjetaPedidoAdmin(pedido) {
 
     let productosHTML = "";
 
-    if (productos.length) {
+
+    if (
+        productos.length
+    ) {
 
         productosHTML =
             productos
-                .map(producto => {
+                .map(
+                    producto => {
 
-                    const nombreProducto =
-                        producto?.nombre ||
-                        producto?.producto ||
-                        producto?.name ||
-                        "Producto";
+                        const nombreProducto =
+                            producto?.nombre ||
+                            producto?.producto ||
+                            producto?.name ||
+                            producto?.product_name ||
+                            "Producto";
 
-                    const cantidadProducto =
-                        Number(
-                            producto?.cantidad ??
-                            producto?.qty ??
-                            producto?.quantity ??
-                            1
-                        ) || 1;
 
-                    return `
-                        <div>
-                            ${escaparHTMLPedidos(nombreProducto)}
-                            × ${cantidadProducto}
-                        </div>
-                    `;
+                        const cantidadProducto =
+                            Number(
+                                producto?.cantidad ??
+                                producto?.qty ??
+                                producto?.quantity ??
+                                1
+                            ) || 1;
 
-                })
+
+                        return `
+    < div >
+    ${escaparHTMLPedidos(
+                            nombreProducto
+                        )
+                            }
+                                × ${cantidadProducto}
+                            </div >
+    `;
+
+                    }
+                )
                 .join("");
+
 
     } else {
 
         productosHTML = `
-            <div>
-                Sin productos registrados
-            </div>
-        `;
+    < div >
+    Sin productos registrados
+            </div >
+    `;
     }
 
 
@@ -650,52 +790,62 @@ function crearTarjetaPedidoAdmin(pedido) {
 
     /* =====================================================
        BOTÓN CONFIRMAR COMPRA
+    =====================================================
+
+       IMPORTANTE:
+
+       La confirmación real se hace desde admin.js.
+
+       Esto evita tener dos sistemas diferentes
+       de descuento de stock.
+
     ===================================================== */
 
     if (!confirmada) {
 
         botonCompra = `
-            <button
-                type="button"
-                class="btn-principal"
-                onclick="confirmarCompraPedido('${escaparHTMLPedidos(id)}')"
-            >
-                <i class="fa-solid fa-check"></i>
+    < button
+type = "button"
+class="btn-principal"
+onclick = "confirmarCompraPedido('${escaparHTMLPedidos(id)}')"
+    >
+    <i class="fa-solid fa-check"></i>
                 Confirmar compra
-            </button>
-        `;
+            </button >
+    `;
 
     } else {
 
         botonCompra = `
-            <button
-                type="button"
-                class="btn-principal"
-                disabled
-            >
-                <i class="fa-solid fa-check"></i>
+    < button
+type = "button"
+class="btn-principal"
+disabled
+    >
+    <i class="fa-solid fa-check"></i>
                 Compra confirmada
-            </button>
-        `;
+            </button >
+    `;
     }
 
 
     /* =====================================================
-       BOTÓN DE PUNTOS
+       BOTÓN PUNTOS
     ===================================================== */
 
     if (!confirmada) {
 
         botonPuntos = `
-            <button
-                type="button"
-                class="btn-secundario"
-                disabled
-            >
-                <i class="fa-solid fa-star"></i>
+    < button
+type = "button"
+class="btn-secundario"
+disabled
+    >
+    <i class="fa-solid fa-star"></i>
                 Confirma la compra primero
-            </button>
-        `;
+            </button >
+    `;
+
 
     } else if (puntosValidados) {
 
@@ -704,43 +854,46 @@ function crearTarjetaPedidoAdmin(pedido) {
                 pedido?.puntos_generados
             ) || puntos;
 
+
         botonPuntos = `
-            <button
-                type="button"
-                class="btn-secundario"
-                disabled
-            >
-                <i class="fa-solid fa-star"></i>
+    < button
+type = "button"
+class="btn-secundario"
+disabled
+    >
+    <i class="fa-solid fa-star"></i>
                 Puntos otorgados:
                 ${puntosOtorgados}
-            </button>
-        `;
+            </button >
+    `;
+
 
     } else if (puntos <= 0) {
 
         botonPuntos = `
-            <button
-                type="button"
-                class="btn-secundario"
-                disabled
-            >
-                <i class="fa-solid fa-star"></i>
+    < button
+type = "button"
+class="btn-secundario"
+disabled
+    >
+    <i class="fa-solid fa-star"></i>
                 Sin puntos
-            </button>
-        `;
+            </button >
+    `;
+
 
     } else {
 
         botonPuntos = `
-            <button
-                type="button"
-                class="btn-principal"
-                onclick="darPuntosPedido('${escaparHTMLPedidos(id)}')"
-            >
-                <i class="fa-solid fa-star"></i>
+    < button
+type = "button"
+class="btn-principal"
+onclick = "darPuntosPedido('${escaparHTMLPedidos(id)}')"
+    >
+    <i class="fa-solid fa-star"></i>
                 Dar ${puntos} puntos
-            </button>
-        `;
+            </button >
+    `;
     }
 
 
@@ -759,10 +912,10 @@ function crearTarjetaPedidoAdmin(pedido) {
     ===================================================== */
 
     return `
-        <div
-            class="producto-card"
-            data-pedido-id="${escaparHTMLPedidos(id)}"
-        >
+    < div
+class="producto-card"
+data - pedido - id="${escaparHTMLPedidos(id)}"
+    >
 
             <div class="producto-card-cabecera">
 
@@ -782,6 +935,7 @@ function crearTarjetaPedidoAdmin(pedido) {
                     </span>
 
                 </div>
+
 
                 <span
                     class="badge-estado ${escaparHTMLPedidos(estado)}"
@@ -865,146 +1019,93 @@ function crearTarjetaPedidoAdmin(pedido) {
 
             </div>
 
-        </div>
+        </div >
     `;
 }
 
 
 /* =========================================================
    CONFIRMAR COMPRA
+=========================================================
+
+   ESTE ARCHIVO NO CREA UN SEGUNDO SISTEMA DE STOCK.
+
+   Si admin.js ya tiene:
+
+   window.confirmarCompra()
+
+   se utiliza esa función.
+
+   La función principal de admin.js es la encargada de:
+
+   - verificar pedido
+   - verificar stock
+   - descontar stock
+   - confirmar pedido
+   - restaurar stock si algo falla
+
 ========================================================= */
 
 window.confirmarCompraPedido =
     async function (pedidoId) {
 
-        if (!pedidoId) {
+        if (
+            pedidoId === null ||
+            pedidoId === undefined ||
+            pedidoId === ""
+        ) {
             return;
         }
 
-        const confirmar =
-            window.confirm(
-                "¿Confirmar esta compra?"
-            );
 
-        if (!confirmar) {
-            return;
-        }
+        /* =================================================
+           BUSCAR FUNCIÓN PRINCIPAL
+        ================================================= */
 
-        try {
+        if (
+            typeof window.confirmarCompra ===
+            "function"
+        ) {
 
-            /* =============================================
-               BUSCAR PEDIDO
-            ============================================= */
+            try {
 
-            const {
-                data: pedido,
-                error: errorPedido
-            } =
-                await supabasePedidosAdmin
-                    .from("pedidos")
-                    .select("*")
-                    .eq("id", pedidoId)
-                    .maybeSingle();
+                await window.confirmarCompra(
+                    pedidoId
+                );
 
-            if (errorPedido) {
+            } catch (error) {
 
                 console.error(
-                    "Error obteniendo pedido:",
-                    errorPedido
-                );
-
-                alert(
-                    "No se pudo obtener el pedido:\n\n" +
-                    errorPedido.message
-                );
-
-                return;
-            }
-
-            if (!pedido) {
-
-                alert(
-                    "No se encontró el pedido."
-                );
-
-                return;
-            }
-
-
-            /* =============================================
-               COMPROBAR SI YA ESTÁ CONFIRMADO
-            ============================================= */
-
-            const estadoActual =
-                String(
-                    pedido.estado || ""
-                ).toLowerCase();
-
-            if (estadoActual === "confirmada") {
-
-                alert(
-                    "Esta compra ya está confirmada."
-                );
-
-                await cargarPedidosAdministracion();
-
-                return;
-            }
-
-
-            /* =============================================
-               CONFIRMAR
-            ============================================= */
-
-            const {
-                error
-            } =
-                await supabasePedidosAdmin
-                    .from("pedidos")
-                    .update({
-                        estado: "confirmada",
-                        confirmado_en:
-                            new Date().toISOString()
-                    })
-                    .eq("id", pedidoId);
-
-            if (error) {
-
-                console.error(
-                    "Error confirmando compra:",
+                    "Error utilizando confirmarCompra de admin.js:",
                     error
                 );
 
                 alert(
                     "No se pudo confirmar la compra:\n\n" +
-                    error.message
+                    (
+                        error?.message ||
+                        "Error desconocido"
+                    )
                 );
-
-                return;
             }
 
-
-            alert(
-                "Compra confirmada correctamente."
-            );
-
-            await cargarPedidosAdministracion();
-
-        } catch (error) {
-
-            console.error(
-                "Error confirmando compra:",
-                error
-            );
-
-            alert(
-                "Ocurrió un error:\n\n" +
-                (
-                    error?.message ||
-                    "Error desconocido"
-                )
-            );
+            return;
         }
+
+
+        /* =================================================
+           SI ADMIN.JS NO ESTÁ CARGADO
+        ================================================= */
+
+        console.error(
+            "No existe window.confirmarCompra."
+        );
+
+
+        alert(
+            "No se encontró la función principal de confirmación.\n\n" +
+            "Asegúrate de que admin.js esté cargado antes de pedidos-admin.js."
+        );
     };
 
 
@@ -1015,18 +1116,25 @@ window.confirmarCompraPedido =
 window.darPuntosPedido =
     async function (pedidoId) {
 
-        if (!pedidoId) {
+        if (
+            pedidoId === null ||
+            pedidoId === undefined ||
+            pedidoId === ""
+        ) {
             return;
         }
+
 
         const confirmar =
             window.confirm(
                 "¿Deseas otorgar los puntos de este pedido?"
             );
 
+
         if (!confirmar) {
             return;
         }
+
 
         try {
 
@@ -1041,8 +1149,12 @@ window.darPuntosPedido =
                 await supabasePedidosAdmin
                     .from("pedidos")
                     .select("*")
-                    .eq("id", pedidoId)
+                    .eq(
+                        "id",
+                        pedidoId
+                    )
                     .maybeSingle();
+
 
             if (errorPedido) {
 
@@ -1051,6 +1163,7 @@ window.darPuntosPedido =
                     errorPedido
                 );
 
+
                 alert(
                     "No se pudo obtener el pedido:\n\n" +
                     errorPedido.message
@@ -1058,6 +1171,7 @@ window.darPuntosPedido =
 
                 return;
             }
+
 
             if (!pedido) {
 
@@ -1078,7 +1192,10 @@ window.darPuntosPedido =
                     pedido.estado || ""
                 ).toLowerCase();
 
-            if (estado !== "confirmada") {
+
+            if (
+                estado !== "confirmada"
+            ) {
 
                 alert(
                     "Primero debes confirmar la compra."
@@ -1100,6 +1217,7 @@ window.darPuntosPedido =
                     "Los puntos de este pedido ya fueron otorgados."
                 );
 
+
                 await cargarPedidosAdministracion();
 
                 return;
@@ -1111,7 +1229,9 @@ window.darPuntosPedido =
             ============================================= */
 
             const total =
-                obtenerTotalPedidoAdmin(pedido);
+                obtenerTotalPedidoAdmin(
+                    pedido
+                );
 
 
             /* =============================================
@@ -1119,12 +1239,18 @@ window.darPuntosPedido =
             ============================================= */
 
             const puntos =
-                calcularPuntosPedidoAdmin(total);
+                calcularPuntosPedidoAdmin(
+                    total
+                );
 
-            if (puntos <= 0) {
+
+            if (
+                puntos <= 0
+            ) {
 
                 alert(
-                    "El pedido no tiene un total válido para generar puntos."
+                    "Este pedido no alcanza Q10.\n\n" +
+                    "El mínimo para generar puntos es Q10."
                 );
 
                 return;
@@ -1136,14 +1262,17 @@ window.darPuntosPedido =
             ============================================= */
 
             const usuarioId =
-                obtenerUsuarioIdPedido(pedido);
+                obtenerUsuarioIdPedido(
+                    pedido
+                );
+
 
             console.log(
                 "===================================="
             );
 
             console.log(
-                "GENERANDO PUNTOS"
+                "DL LUXURY - GENERANDO PUNTOS"
             );
 
             console.log(
@@ -1162,12 +1291,16 @@ window.darPuntosPedido =
 
             console.log(
                 "Cliente:",
-                obtenerNombreClientePedido(pedido)
+                obtenerNombreClientePedido(
+                    pedido
+                )
             );
 
             console.log(
                 "Correo:",
-                obtenerCorreoClientePedido(pedido)
+                obtenerCorreoClientePedido(
+                    pedido
+                )
             );
 
             console.log(
@@ -1187,46 +1320,57 @@ window.darPuntosPedido =
 
                IMPORTANTE:
 
-               SOLO se modifica la tabla pedidos.
+               SOLO se actualiza la tabla pedidos.
 
-               NO se toca perfiles.
+               NO se modifica perfiles.
 
-               También se aceptan registros antiguos
-               donde puntos_validados sea NULL.
+               NO se utiliza perfiles.Puntos.
+
+               NO se utiliza .select() después del UPDATE.
+
+               Esto evita problemas de RLS relacionados
+               con la respuesta del UPDATE.
             ============================================= */
 
             const {
-                data: pedidoActualizado,
                 error: errorValidarPedido
             } =
                 await supabasePedidosAdmin
                     .from("pedidos")
                     .update({
-                        puntos_generados: puntos,
-                        puntos_validados: true,
+
+                        puntos_generados:
+                            puntos,
+
+                        puntos_validados:
+                            true,
+
                         puntos_validados_en:
                             new Date().toISOString()
+
                     })
-                    .eq("id", pedidoId)
+                    .eq(
+                        "id",
+                        pedidoId
+                    )
                     .or(
                         "puntos_validados.is.null,puntos_validados.eq.false"
-                    )
-                    .select(
-                        "id, usuario_id, puntos_generados, puntos_validados, puntos_validados_en"
-                    )
-                    .maybeSingle();
+                    );
 
 
             /* =============================================
-               ERROR
+               8. ERROR
             ============================================= */
 
-            if (errorValidarPedido) {
+            if (
+                errorValidarPedido
+            ) {
 
                 console.error(
                     "Error registrando puntos:",
                     errorValidarPedido
                 );
+
 
                 alert(
                     "No se pudieron generar los puntos.\n\n" +
@@ -1239,47 +1383,16 @@ window.darPuntosPedido =
 
 
             /* =============================================
-               NO SE ACTUALIZÓ
-            ============================================= */
-
-            if (!pedidoActualizado) {
-
-                alert(
-                    "Los puntos no fueron generados.\n\n" +
-                    "Es posible que ya hayan sido otorgados."
-                );
-
-                await cargarPedidosAdministracion();
-
-                return;
-            }
-
-
-            /* =============================================
-               VERIFICAR ACTUALIZACIÓN
-            ============================================= */
-
-            if (
-                pedidoActualizado.puntos_validados !== true
-            ) {
-
-                alert(
-                    "No se pudo confirmar que los puntos quedaron registrados."
-                );
-
-                return;
-            }
-
-
-            /* =============================================
-               ÉXITO
+               9. ÉXITO
             ============================================= */
 
             alert(
                 "¡Puntos generados correctamente!\n\n" +
 
                 "Cliente: " +
-                obtenerNombreClientePedido(pedido) +
+                obtenerNombreClientePedido(
+                    pedido
+                ) +
 
                 "\n\n" +
 
@@ -1298,15 +1411,16 @@ window.darPuntosPedido =
 
                 "\n\n" +
 
-                "Sistema: 1 punto por cada Q10 de compra"
+                "Regla: 1 punto por cada Q10 de compra."
             );
 
 
             /* =============================================
-               RECARGAR
+               10. RECARGAR
             ============================================= */
 
             await cargarPedidosAdministracion();
+
 
         } catch (error) {
 
@@ -1314,6 +1428,7 @@ window.darPuntosPedido =
                 "Error generando los puntos:",
                 error
             );
+
 
             alert(
                 "Ocurrió un error al generar los puntos:\n\n" +
@@ -1336,10 +1451,12 @@ document.addEventListener(
 
         cargarPedidosAdministracion();
 
+
         const selector =
             document.getElementById(
                 "selectorAño"
             );
+
 
         if (selector) {
 
@@ -1364,20 +1481,26 @@ document.addEventListener(
 window.cargarPedidosAdministracion =
     cargarPedidosAdministracion;
 
+
 window.calcularPuntosPedidoAdmin =
     calcularPuntosPedidoAdmin;
+
 
 window.obtenerTotalPedidoAdmin =
     obtenerTotalPedidoAdmin;
 
+
 window.obtenerProductosPedidoAdmin =
     obtenerProductosPedidoAdmin;
+
 
 window.obtenerUsuarioIdPedido =
     obtenerUsuarioIdPedido;
 
+
 window.obtenerNombreClientePedido =
     obtenerNombreClientePedido;
+
 
 window.obtenerCorreoClientePedido =
     obtenerCorreoClientePedido;
@@ -1404,7 +1527,19 @@ console.log(
 );
 
 console.log(
+    "Q1 = 0 puntos"
+);
+
+console.log(
+    "Q9 = 0 puntos"
+);
+
+console.log(
     "Q10 = 1 punto"
+);
+
+console.log(
+    "Q20 = 2 puntos"
 );
 
 console.log(
@@ -1433,4 +1568,44 @@ console.log(
 
 console.log(
     "===================================="
+);
+
+
+/* =========================================================
+   PRUEBAS AUTOMÁTICAS DE PUNTOS
+========================================================= */
+
+console.log(
+    "PRUEBA Q5:",
+    calcularPuntosPedidoAdmin(5)
+);
+
+console.log(
+    "PRUEBA Q10:",
+    calcularPuntosPedidoAdmin(10)
+);
+
+console.log(
+    "PRUEBA Q20:",
+    calcularPuntosPedidoAdmin(20)
+);
+
+console.log(
+    "PRUEBA Q50:",
+    calcularPuntosPedidoAdmin(50)
+);
+
+console.log(
+    "PRUEBA Q100:",
+    calcularPuntosPedidoAdmin(100)
+);
+
+console.log(
+    "PRUEBA Q500:",
+    calcularPuntosPedidoAdmin(500)
+);
+
+console.log(
+    "PRUEBA Q1000:",
+    calcularPuntosPedidoAdmin(1000)
 );
